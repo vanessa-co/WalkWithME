@@ -1,12 +1,7 @@
 import React from 'react';
 
-const Home = () => {
-  return (
-    <div>
-      <h2>HomePage</h2>
-      <p>Welcome to the Walks App!</p>
-    </div>
-  );
-};
+function Home() {
+  return <div>Welcome to the Home Page!</div>;
+}
 
 export default Home;

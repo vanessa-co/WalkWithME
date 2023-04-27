@@ -1,34 +1,38 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { UserContext } from '../App';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 
-const Walks = () => {
-  const { user } = useContext(UserContext);
+function Walks() {
   const [walks, setWalks] = useState([]);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    if (user) {
-      fetch('http://127.0.0.1:5555/walks')
-        .then((response) => response.json())
-        .then((data) => setWalks(data));
-    }
-  }, [user]);
+    const fetchWalks = async () => {
+      const response = await fetch('http://127.0.0.1:5555/walks');
+      const data = await response.json();
+      setWalks(data);
+    };
 
-  if (!user) {
-    return <p>your walks.</p>;
-  }
+    fetchWalks();
+  }, []);
 
   return (
     <div>
       <h2>Walks</h2>
+      {user && <p>Welcome, {user.username}!</p>}
       <ul>
         {walks.map((walk) => (
           <li key={walk.id}>
             {walk.name} - {walk.location}
+            <div>Distance: {walk.distance} miles</div>
+            <div>
+              <img src={walk.photo} alt={walk.name} style={{ width: '300px', height: '200px' }} />
+            </div>
+            <div>User ID: {walk.user_id}</div>
           </li>
         ))}
       </ul>
     </div>
   );
-};
+}
 
 export default Walks;
