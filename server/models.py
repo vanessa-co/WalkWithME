@@ -39,7 +39,7 @@ class User(db.Model):
 
 class Walk(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    location = db.Column(db.String(120), nullable=False)
     distance = db.Column(db.Float, nullable=False)
     photo = db.Column(db.String, nullable=True)
     description = db.Column(db.String(255), nullable=True)
@@ -49,7 +49,7 @@ class Walk(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "location": self.location,
             "distance": self.distance,
             "photo": self.photo,
             "description": self.description,

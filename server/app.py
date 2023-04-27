@@ -1,12 +1,18 @@
 
-
 import secrets
-from flask import request, jsonify
+from flask import request, jsonify, session,  send_from_directory
 from flask_restful import Resource
 from models import User, Walk, Review, Follow
 from config import app, api, db
 import requests
 import bcrypt
+from werkzeug.utils import secure_filename
+import os
+
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
@@ -86,6 +92,8 @@ class WalkResource(Resource):
 api.add_resource(WalkResource, '/walks', '/walks/<int:walk_id>')
 
 class ReviewResource(Resource):
+    def allowed_file(self, filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
     def get(self, review_id=None):
         if review_id:
             review = Review.query.get(review_id)
@@ -102,12 +110,55 @@ class ReviewResource(Resource):
 
         if not rating or not text or not user_id or not walk_id:
             return {"error": "Rating, text, user_id, and walk_id are required fields"}, 400
-
+        
         review = Review(rating=rating, text=text, user_id=user_id, walk_id=walk_id)
+
+        if 'photo' in request.files:
+            photo = request.files['photo']
+            if photo and self.allowed_file(photo.filename):
+                filename = secure_filename(photo.filename)
+                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                review.photo = filename
+
         db.session.add(review)
         db.session.commit()
 
         return {"message": "Review created successfully"}, 201
+        db.session.add(review)
+        db.session.commit()
+
+    def put(self, review_id):
+        review = Review.query.get(review_id)
+        if not review:
+            return {"error": "Review not found"}, 404
+
+        if 'rating' in request.form:
+            review.rating = request.form.get('rating')
+        if 'text' in request.form:
+            review.text = request.form.get('text')
+
+        if 'photo' in request.files:
+            photo = request.files['photo']
+            if photo and self.allowed_file(photo.filename):
+                filename = secure_filename(photo.filename)
+                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                review.photo = filename
+
+        db.session.commit()
+
+        return {"message": "Review updated successfully"}, 200
+
+    def delete(self, review_id):
+        review = Review.query.get(review_id)
+        if not review:
+            return {"error": "Review not found"}, 404
+
+        db.session.delete(review)
+        db.session.commit()
+
+        return {"message": "Review deleted successfully"}, 200
+
+
 api.add_resource(ReviewResource, '/reviews', '/reviews/<int:review_id>')
 
 class FollowResource(Resource):
@@ -148,10 +199,17 @@ def login():
 
     return {"message": "Logged in successfully"}, 200
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Clear the session data
+    session.clear()
+    return {"message": "Logged out successfully"}, 200
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-
-
-
 
