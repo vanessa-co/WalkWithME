@@ -1,0 +1,12 @@
+/* logout goodbye */
+
+.custom-toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .custom-toast-image {
+    width: 100px;
+    height: 100px;
+  }
