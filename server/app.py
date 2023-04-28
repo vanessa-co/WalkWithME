@@ -9,18 +9,29 @@ import bcrypt
 from werkzeug.utils import secure_filename
 import os
 
-UPLOAD_FOLDER = './uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config["SECRET_KEY"] = secrets.token_hex(16)
+
+
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 class Home(Resource):
     def get(self):
         return 'HomePage'
        
 api.add_resource(Home, '/')
+
+
 
 class UserResource(Resource):
     def get(self, user_id=None):
@@ -91,9 +102,8 @@ class WalkResource(Resource):
 
 api.add_resource(WalkResource, '/walks', '/walks/<int:walk_id>')
 
+
 class ReviewResource(Resource):
-    def allowed_file(self, filename):
-        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
     def get(self, review_id=None):
         if review_id:
             review = Review.query.get(review_id)
@@ -110,39 +120,23 @@ class ReviewResource(Resource):
 
         if not rating or not text or not user_id or not walk_id:
             return {"error": "Rating, text, user_id, and walk_id are required fields"}, 400
-        
-        review = Review(rating=rating, text=text, user_id=user_id, walk_id=walk_id)
 
-        if 'photo' in request.files:
-            photo = request.files['photo']
-            if photo and self.allowed_file(photo.filename):
-                filename = secure_filename(photo.filename)
-                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                review.photo = filename
+        review = Review(rating=rating, text=text, user_id=user_id, walk_id=walk_id)
 
         db.session.add(review)
         db.session.commit()
 
         return {"message": "Review created successfully"}, 201
-        db.session.add(review)
-        db.session.commit()
-
+  
     def put(self, review_id):
         review = Review.query.get(review_id)
         if not review:
             return {"error": "Review not found"}, 404
 
-        if 'rating' in request.form:
-            review.rating = request.form.get('rating')
-        if 'text' in request.form:
-            review.text = request.form.get('text')
-
-        if 'photo' in request.files:
-            photo = request.files['photo']
-            if photo and self.allowed_file(photo.filename):
-                filename = secure_filename(photo.filename)
-                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                review.photo = filename
+        if 'rating' in request.json:
+            review.rating = request.json.get('rating')
+        if 'text' in request.json:
+            review.text = request.json.get('text')
 
         db.session.commit()
 
@@ -160,6 +154,8 @@ class ReviewResource(Resource):
 
 
 api.add_resource(ReviewResource, '/reviews', '/reviews/<int:review_id>')
+
+
 
 class FollowResource(Resource):
     def get(self, follow_id=None):

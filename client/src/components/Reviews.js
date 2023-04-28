@@ -1,125 +1,52 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import React, { useContext, useEffect, useState } from "react";
+import { Container, Header, Icon, Card } from "semantic-ui-react";
+import { ReviewsContext } from "../contexts/ReviewsContext";
 
 const Reviews = () => {
-  const [reviews, setReviews] = useState([]);
-  const [reviewText, setReviewText] = useState('');
-  const [reviewRating, setReviewRating] = useState(1);
-  const [reviewPhoto, setReviewPhoto] = useState(null);
-  const [selectedReview, setSelectedReview] = useState(null);
-  const user = useContext(AuthContext);
+  const { reviews } = useContext(ReviewsContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:5555/reviews');
-        const data = await response.json();
-        setReviews(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    setLoading(false);
+  }, [reviews]);
 
-    fetchData();
-  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('text', reviewText);
-    formData.append('rating', reviewRating);
-    if (reviewPhoto) {
-      formData.append('photo', reviewPhoto);
-    }
-
-    try {
-      const response = await fetch(selectedReview ? `http://127.0.0.1:5555/reviews/${selectedReview.id}` : 'http://127.0.0.1:5555/reviews', {
-        method: selectedReview ? 'PUT' : 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (selectedReview) {
-        setReviews(reviews.map((review) => (review.id === data.id ? data : review)));
-      } else {
-        setReviews([...reviews, data]);
-      }
-
-      setReviewText('');
-      setReviewRating(1);
-      setReviewPhoto(null);
-      setSelectedReview(null);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleDelete = async (reviewId) => {
-    try {
-      await fetch(`http://127.0.0.1:5555/reviews/${reviewId}`, {
-        method: 'DELETE',
-      });
-      setReviews(reviews.filter((review) => review.id !== reviewId));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleEdit = (review) => {
-    setSelectedReview(review);
-    setReviewText(review.text);
-    setReviewRating(review.rating);
-    setReviewPhoto(review.photo);
-  };
-
-  if (!user) {
-    return <p>You need to be logged in to view reviews.</p>;
+  if (!reviews || reviews.length === 0) {
+    return <div>No reviews found.</div>;
   }
 
   return (
-    <div>
-      <h1>Reviews</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="reviewText">Review Text:</label>
-        <input
-          id="reviewText"
-          type="text"
-          value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
-        />
+    <Container style={{ marginTop: "20px" }}>
+      <Header as="h2" icon textAlign="center">
+        <Icon name="comments" circular />
+        <Header.Content>Reviews</Header.Content>
+      </Header>
+      <Card.Group>
+        {reviews.map((review) => (
+          <Card key={review.id}>
+            <Card.Content>
+              <Card.Header>{review.walk.title}</Card.Header>
+              <Card.Meta>
+                <span className="date">
+                  {new Date(review.created_at).toLocaleDateString()}
+                </span>
+              </Card.Meta>
+              <Card.Description>{review.text}</Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              <Icon name="star" color="yellow" />
+              {review.rating}
+            </Card.Content>
+          </Card>
+        ))}
+      </Card.Group>
+    </Container>
+  );
+};
 
-        <label htmlFor="reviewRating">Rating:</label>
-        <input
-          id="reviewRating"
-          type="number"
-          min="1"
-          max="5"
-          value={reviewRating}
-          onChange={(e) => setReviewRating(e.target.value)}
-        />
+export default Reviews;
 
-        <label htmlFor="reviewPhoto">Photo:</label>
-        <input
-          id="reviewPhoto"
-          type="file"
-          onChange={(e) => setReviewPhoto(e.target.files[0])}
-        />
 
-        <button type="submit">{selectedReview ? 'Update' : 'Submit'} Review</button>
-      </form>
-      {reviews.map((review) => (
-            <div key={review.id}>
-            <h3>{review.text}</h3>
-            <p>Rating: {review.rating}</p>
-            {review.photo && <img src={review.photo} alt="Review" width="200" />}
-            <button onClick={() => handleEdit(review)}>Edit</button>
-            <button onClick={() => handleDelete(review.id)}>Delete</button>
-            </div>
-            ))}
-          </div>
-        );
-      };
-      
-      export default Reviews;
-      

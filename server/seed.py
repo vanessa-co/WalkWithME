@@ -11,10 +11,9 @@ def seed_data():
     vanessa = User(username='vanessa', email='vanessa@email.com', password='password1')
     kim = User(username='kim', email='kim@email.com', password='password2')
     kevin = User(username='kevin', email='kevin@email.com', password='password3')
-    john = User(username='john', email='john@email.com', password='password4')
-    emma = User(username='emma', email='emma@email.com', password='password5')
+   
 
-    db.session.add_all([vanessa, kim, kevin, john, emma])
+    db.session.add_all([vanessa, kim, kevin])
     db.session.commit()
 
     # Walks for Vanessa
