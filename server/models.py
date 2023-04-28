@@ -13,10 +13,17 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     walks = db.relationship('Walk', backref='user', lazy=True)
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password=None, password_hash=None):
         self.username = username
         self.email = email
-        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        if password:
+            self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        elif password_hash:
+            self.password_hash = password_hash
+        else:
+            raise ValueError("Either 'password' or 'password_hash' argument must be provided")
+
+
 
     @validates('email')
     def validate_email(self, key, email):

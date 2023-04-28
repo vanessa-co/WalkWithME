@@ -1,5 +1,3 @@
-
-
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
@@ -34,10 +32,24 @@ function Navbar() {
       {user ? (
         <button onClick={handleLogout}>Logout</button>
       ) : (
-        <Link to="/login">Login</Link>
+        <Link to="/auth">Login / Signup</Link>
       )}
     </nav>
   );
 }
 
 export default Navbar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

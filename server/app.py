@@ -185,19 +185,45 @@ class FollowResource(Resource):
 api.add_resource(FollowResource, '/follows', '/follows/<int:follow_id>')
 
 
-@app.route('/login', methods=['POST'])
-def login():
+
+
+@app.route('/auth', methods=['POST'])
+def auth():
+    action = request.json.get('action')
     username = request.json.get('username')
+    email = request.json.get('email')
     password = request.json.get('password')
 
     if not username or not password:
         return {"error": "Username and password are required"}, 400
 
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.check_password(password):
-        return {"error": "Invalid credentials"}, 401
+    if action == 'login':
+        user = User.query.filter_by(username=username).first()
+        if not user or not user.check_password(password):
+            return {"error": "Invalid credentials"}, 401
 
-    return {"message": "Logged in successfully"}, 200
+        return {"message": "Logged in successfully", "user": user.to_dict()}, 200
+    elif action == 'signup':
+        if not email:
+            return {"error": "Email is required for signup"}, 400
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            return {"error": "Username already exists"}, 409
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            return {"error": "Email already exists"}, 409
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        user = User(username=username, email=email, password_hash=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+
+        return {"message": "User created successfully", "user": user.to_dict()}, 201
+    else:
+        return {"error": "Invalid action"}, 400
+
 
 @app.route('/logout', methods=['POST'])
 def logout():

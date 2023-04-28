@@ -1,8 +1,8 @@
-"""models changes
+"""model remastered
 
-Revision ID: e126f7e07af7
+Revision ID: a8ad0464049c
 Revises: 
-Create Date: 2023-04-27 17:24:03.279459
+Create Date: 2023-04-28 00:17:46.312705
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e126f7e07af7'
+revision = 'a8ad0464049c'
 down_revision = None
 branch_labels = None
 depends_on = None
