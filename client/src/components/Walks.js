@@ -22,12 +22,11 @@ function Walks() {
       <ul>
         {walks.map((walk) => (
           <li key={walk.id}>
-            {walk.name} - {walk.location}
-            <div>Distance: {walk.distance} miles</div>
+            <h3>{walk.location}</h3>
+            <div>Description: {walk.description}</div>
             <div>
               <img src={walk.photo} alt={walk.name} style={{ width: '300px', height: '200px' }} />
             </div>
-            <div>User ID: {walk.user_id}</div>
           </li>
         ))}
       </ul>

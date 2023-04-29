@@ -1,36 +1,38 @@
-
 import secrets
-from flask import request, jsonify, session,  send_from_directory
+from flask import request, jsonify, session, send_from_directory
 from flask_restful import Resource
 from models import User, Walk, Review, Follow
 from config import app, api, db
-import requests
 import bcrypt
 from werkzeug.utils import secure_filename
 import os
-
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 @app.after_request
 def add_header(response):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     response.headers['Cache-Control'] = 'public, max-age=0'
     return response
 
+
 class Home(Resource):
     def get(self):
         return 'HomePage'
+
        
 api.add_resource(Home, '/')
-
 
 
 class UserResource(Resource):
@@ -41,7 +43,6 @@ class UserResource(Resource):
         else:
             users = User.query.all()
             return [user.to_dict() for user in users]
-
 
     def post(self):
         username = request.json.get('username')
@@ -65,7 +66,6 @@ class UserResource(Resource):
         db.session.commit()
 
         return {"message": "User created successfully"}, 201
-
 
     def delete(self, user_id):
         user = User.query.get(user_id)
@@ -103,57 +103,40 @@ class WalkResource(Resource):
 api.add_resource(WalkResource, '/walks', '/walks/<int:walk_id>')
 
 
+
+reviews = []
+
 class ReviewResource(Resource):
-    def get(self, review_id=None):
-        if review_id:
-            review = Review.query.get(review_id)
-            return review.to_dict() if review else {"error": "Review not found"}, 404
-        else:
-            reviews = Review.query.all()
-            return [review.to_dict() for review in reviews]
+    def get(self):
+        return reviews
 
     def post(self):
-        rating = request.json.get('rating')
-        text = request.json.get('text')
-        user_id = request.json.get('user_id')
-        walk_id = request.json.get('walk_id')
+        review = request.json
+        review['id'] = len(reviews) + 1
+        reviews.append(review)
+        return review, 201
 
-        if not rating or not text or not user_id or not walk_id:
-            return {"error": "Rating, text, user_id, and walk_id are required fields"}, 400
+class ReviewByIdResource(Resource):
+    def find_review(self, review_id):
+        return next((r for r in reviews if r['id'] == review_id), None)
 
-        review = Review(rating=rating, text=text, user_id=user_id, walk_id=walk_id)
-
-        db.session.add(review)
-        db.session.commit()
-
-        return {"message": "Review created successfully"}, 201
-  
-    def put(self, review_id):
-        review = Review.query.get(review_id)
-        if not review:
-            return {"error": "Review not found"}, 404
-
-        if 'rating' in request.json:
-            review.rating = request.json.get('rating')
-        if 'text' in request.json:
-            review.text = request.json.get('text')
-
-        db.session.commit()
-
-        return {"message": "Review updated successfully"}, 200
+    def patch(self, review_id):
+        review = self.find_review(review_id)
+        if review:
+            updated_data = request.json
+            review.update(updated_data)
+            return review
+        return {'error': 'Review not found'}, 404
 
     def delete(self, review_id):
-        review = Review.query.get(review_id)
-        if not review:
-            return {"error": "Review not found"}, 404
+        global reviews
+        reviews = [r for r in reviews if r['id'] != review_id]
+        return {'result': 'Review deleted'}
 
-        db.session.delete(review)
-        db.session.commit()
-
-        return {"message": "Review deleted successfully"}, 200
+api.add_resource(ReviewResource, '/reviews')
+api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
 
 
-api.add_resource(ReviewResource, '/reviews', '/reviews/<int:review_id>')
 
 
 
@@ -232,6 +215,56 @@ def logout():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    if not username or not password:
+        return {"error": "Username and password are required"}, 400
+
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return {"error": "Invalid credentials"}, 401
+
+    login_user(user)
+    return {"message": "Logged in successfully", "user": user.to_dict()}, 200
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if not username or not email or not password:
+        return {"error": "All fields are required"}, 400
+
+    user = User.query.filter_by(username=username).first()
+    if user:
+        return {"error": "Username already exists"}, 409
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        return {"error": "Email already exists"}, 409
+
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    user = User(username=username, email=email, password_hash=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+
+    return {"message": "User created successfully", "user": user.to_dict()}, 201
+
+
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout_user_route():
+    logout_user()
+    return {"message": "Logged out successfully"}, 200
+
+
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+
 
