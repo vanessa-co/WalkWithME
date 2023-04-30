@@ -5,9 +5,11 @@ from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 from config import db
 from email_validator import validate_email, EmailNotValidError
+from sqlalchemy_serializer import SerializerMixin
 
 
-class User(db.Model):
+
+class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -18,6 +20,7 @@ class User(db.Model):
     reviews = db.relationship('Review', back_populates='user', lazy=True)
     followed = association_proxy('followed_assoc', 'followed')
     followers = association_proxy('followers_assoc', 'follower')
+
 
     def __init__(self, username, email, password=None, password_hash=None):
         self.username = username
@@ -65,7 +68,8 @@ class User(db.Model):
 
 
 
-class Walk(db.Model):
+
+class Walk(db.Model, SerializerMixin):
     __tablename__ = 'walks'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, default='Unnamed Walk')
@@ -87,7 +91,7 @@ class Walk(db.Model):
             "username": self.user.username,
         }
 
-class Review(db.Model):
+class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
     id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     text = db.Column(db.String, nullable=False)
@@ -105,9 +109,10 @@ class Review(db.Model):
             "walk_id": self.walk_id,
             "rating": self.rating,
             "comment": self.comment,
+
         }
 
-class Follow(db.Model):
+class Follow(db.Model, SerializerMixin):
     __tablename__ = 'follows'
 
     id = db.Column(db.Integer, primary_key=True)

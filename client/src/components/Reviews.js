@@ -1,6 +1,7 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+
 import {
   Box,
   Typography,
@@ -14,9 +15,9 @@ import {
   DialogActions,
 } from '@mui/material';
 import { styled } from '@mui/system';
-import { useReviews } from '../contexts/ReviewsContext';
 import OpenStreetMapLocation from './OpenStreetMapLocation';
 import 'leaflet/dist/leaflet.css';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -54,19 +55,101 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
 }));
 
 function Reviews() {
-  const { reviews, addReview, editReview, deleteReview } = useReviews();
+  const [reviews, setReviews] = useState([]);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState('');
   const [reviewLocation, setReviewLocation] = useState('');
   const [editReviewId, setEditReviewId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch('/reviews');
+      const data = await response.json();
+      setReviews(data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const addReview = async (newReview) => {
+    try {
+      const response = await fetch('/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...newReview,
+          user_id: user.id,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error submitting review: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      setReviews([...reviews, data]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+    const editReview = async (id, updatedReview) => {
+    try {
+      const response = await fetch(`/reviews/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...updatedReview,
+          user_id: user.id,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error updating review: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      setReviews(reviews.map((review) => (review.id === id ? data : review)));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  const deleteReview = async (id) => {
+    try {
+      const response = await fetch(`/reviews/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error deleting review: ${response.statusText}`);
+      }
+
+      setReviews(reviews.filter((review) => review.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const newReview = {
       text: reviewText,
       rating: reviewRating,
-      user_id: 2,
+      user_id: user.id,
       location: reviewLocation,
     };
     try {
@@ -101,7 +184,7 @@ function Reviews() {
       id: editReviewId,
       text: reviewText,
       rating: reviewRating,
-      user_id: 2,
+      user_id: user.id,
       location: reviewLocation,
     };
     try {
@@ -123,6 +206,9 @@ function Reviews() {
       console.error(error);
     }
   };
+
+
+
 
   return (
     <Container>
@@ -235,5 +321,3 @@ function Reviews() {
 }
 
 export default Reviews;
-
-

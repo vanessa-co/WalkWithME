@@ -71,11 +71,12 @@ class UserResource(Resource):
             return [user.to_dict() for user in users]
 
     def post(self):
+        name = request.json.get('name')
         username = request.json.get('username')
         email = request.json.get('email')
         password = request.json.get('password')
 
-        if not username or not email or not password:
+        if not name or not username or not email or not password:
             return {"error": "All fields are required"}, 400
 
         user = User.query.filter_by(username=username).first()
@@ -87,7 +88,7 @@ class UserResource(Resource):
             return {"error": "Email already exists"}, 409
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        user = User(username=username, email=email, password_hash=hashed_password)
+        user = User(name=name, username=username, email=email, password_hash=hashed_password)
         db.session.add(user)
         db.session.commit()
 
@@ -100,6 +101,7 @@ class UserResource(Resource):
             db.session.commit()
             return {"message": "User deleted successfully"}
         return {"error": "User not found"}, 404
+
 
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 
@@ -164,38 +166,58 @@ class UserProfilePhotoResource(Resource):
 api.add_resource(UserProfilePhotoResource, '/users/<int:user_id>/profile_photo')
 
 
-
-
-reviews = []
-
 class ReviewResource(Resource):
-    def get(self):
-        return reviews
+    def get(self, review_id=None):
+        if review_id:
+            review = Review.query.get(review_id)
+            return review.to_dict() if review else {"error": "Review not found"}, 404
+        reviews = Review.query.all()
+        return [review.to_dict() for review in reviews]
 
     def post(self):
-        review = request.json
-        review['id'] = len(reviews) + 1
-        reviews.append(review)
-        return review, 201
+        walk_id = request.json.get('walk_id')
+        user_id = request.json.get('user_id')
+        text = request.json.get('text')
+        rating = request.json.get('rating')
+        comment = request.json.get('comment')
+
+        if not walk_id or not user_id or rating is None:
+            return {"error": "walk_id, user_id, and rating are required fields"}, 400
+
+        review = Review(walk_id=walk_id, user_id=user_id, text=text, rating=rating, comment=comment )
+        db.session.add(review)
+        db.session.commit()
+
+        return {"message": "Review created successfully"}, 201
+    
+
+
+
+api.add_resource(ReviewResource, '/reviews')
 
 class ReviewByIdResource(Resource):
-    def find_review(self, review_id):
-        return next((r for r in reviews if r['id'] == review_id), None)
-
     def patch(self, review_id):
-        review = self.find_review(review_id)
+        review = Review.query.get(review_id)
         if review:
             updated_data = request.json
-            review.update(updated_data)
-            return review
+            if 'rating' in updated_data:
+                review.rating = updated_data['rating']
+            if 'text' in updated_data:
+                review.comment = updated_data['text']
+            db.session.commit()
+            return review.to_dict()
         return {'error': 'Review not found'}, 404
 
     def delete(self, review_id):
-        global reviews
-        reviews = [r for r in reviews if r['id'] != review_id]
-        return {'result': 'Review deleted'}
+        review = Review.query.get(review_id)
+        if review:
+            db.session.delete(review)
+            db.session.commit()
+            return {'result': 'Review deleted'}
+        return {'error': 'Review not found'}, 404
 
-api.add_resource(ReviewResource, '/reviews')
+    
+
 api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
 
 
