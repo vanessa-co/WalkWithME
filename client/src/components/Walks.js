@@ -7,7 +7,7 @@ function Walks() {
 
   useEffect(() => {
     const fetchWalks = async () => {
-      const response = await fetch('http://127.0.0.1:5555/walks');
+      const response = await fetch('/walks');
       const data = await response.json();
       setWalks(data);
     };

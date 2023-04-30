@@ -136,7 +136,7 @@ function Reviews() {
         </SubmitButton>
       </Form>
       <Typography variant="h5" gutterBottom>
-        All Reviews
+        {/* All Reviews */}
       </Typography>
       {reviews.map((review) => (
   <PaperStyled key={review.id}>

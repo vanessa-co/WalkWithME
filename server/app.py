@@ -1,3 +1,14 @@
+
+
+
+
+
+
+
+
+
+
+
 import secrets
 from flask import request, jsonify, session, send_from_directory
 from flask_restful import Resource
@@ -9,6 +20,10 @@ import os
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 app.config["SECRET_KEY"] = secrets.token_hex(16)
+
+# Configure the upload folder and allowed file extensions
+app.config['UPLOAD_FOLDER'] = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -25,6 +40,11 @@ def add_header(response):
     response.headers['Expires'] = '0'
     response.headers['Cache-Control'] = 'public, max-age=0'
     return response
+
+# Helper function to check if a file is allowed
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 class Home(Resource):
@@ -77,6 +97,23 @@ class UserResource(Resource):
 
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 
+
+class UserProfileResource(Resource):
+    @login_required
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+        return user.to_dict()
+api.add_resource(UserProfileResource, '/users/<int:user_id>/profile')
+
+
+
+
+
+
+
+
 class WalkResource(Resource):
     def get(self, walk_id=None):
         if walk_id:
@@ -100,45 +137,106 @@ class WalkResource(Resource):
 
         return {"message": "Walk created successfully"}, 201
 
+    def put(self, walk_id):
+        walk = Walk.query.get(walk_id)
+        if walk:
+            updated_data = request.json
+            for key, value in updated_data.items():
+                setattr(walk, key, value)
+            db.session.commit()
+            return walk.to_dict()
+        return {"error": "Walk not found"}, 404
+
+    def delete(self, walk_id):
+        walk = Walk.query.get(walk_id)
+        if walk:
+            db.session.delete(walk)
+            db.session.commit()
+            return {"message": "Walk deleted successfully"}
+        return {"error": "Walk not found"}, 404
+
 api.add_resource(WalkResource, '/walks', '/walks/<int:walk_id>')
 
 
+class UserProfilePhotoResource(Resource):
+    def post(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
 
-reviews = []
+        if 'file' not in request.files:
+            return {"error": "No file provided"}, 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return {"error": "No file selected"}, 400
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            user.profile_photo = filename
+            db.session.commit()
+            return {"message": "Profile photo uploaded successfully"}, 201
+        else:
+            return {"error": "File type not allowed"}, 400
+
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        profile_photo_url = user.get_profile_photo_url()
+        if not profile_photo_url:
+            return {"error": "No profile photo found"}, 404
+
+        return send_from_directory(app.config['UPLOAD_FOLDER'], user.profile_photo)
 
 class ReviewResource(Resource):
     def get(self):
-        return reviews
+        reviews = Review.query.all()
+        return [review.to_dict() for review in reviews]
 
     def post(self):
-        review = request.json
-        review['id'] = len(reviews) + 1
-        reviews.append(review)
-        return review, 201
+        name = request.json.get('name')
+        text = request.json.get('text')
+        rating = request.json.get('rating')
+        user_id = request.json.get('user_id')
+        walk_id = request.json.get('walk_id')
+
+        if not name or not text or not rating or not user_id or not walk_id:
+            return {"error": "All fields are required"}, 400
+
+        review = Review(name=name, text=text, rating=rating, user_id=user_id, walk_id=walk_id)
+        db.session.add(review)
+        db.session.commit()
+
+        return {"message": "Review created successfully"}, 201
 
 class ReviewByIdResource(Resource):
-    def find_review(self, review_id):
-        return next((r for r in reviews if r['id'] == review_id), None)
+    def get(self, review_id):
+        review = Review.query.get(review_id)
+        return review.to_dict() if review else {"error": "Review not found"}, 404
 
     def patch(self, review_id):
-        review = self.find_review(review_id)
+        review = Review.query.get(review_id)
         if review:
             updated_data = request.json
-            review.update(updated_data)
-            return review
-        return {'error': 'Review not found'}, 404
+            for key, value in updated_data.items():
+                setattr(review, key, value)
+            db.session.commit()
+            return review.to_dict()
+        return {"error": "Review not found"}, 404
 
     def delete(self, review_id):
-        global reviews
-        reviews = [r for r in reviews if r['id'] != review_id]
-        return {'result': 'Review deleted'}
+        review = Review.query.get(review_id)
+        if review:
+            db.session.delete(review)
+            db.session.commit()
+            return {"message": "Review deleted successfully"}
+        return {"error": "Review not found"}, 404
 
 api.add_resource(ReviewResource, '/reviews')
 api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
-
-
-
-
 
 class FollowResource(Resource):
     def get(self, follow_id=None):
@@ -161,7 +259,73 @@ class FollowResource(Resource):
 
         return {"message": "Follow created successfully"}, 201
 
+
+class FollowingResource(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        following = [follow.followed.to_dict() for follow in user.followed]
+        return jsonify(following)
+
+api.add_resource(FollowingResource, '/users/<int:user_id>/following')
 api.add_resource(FollowResource, '/follows', '/follows/<int:follow_id>')
+
+
+class UserProfilePhotoResource(Resource):
+    def post(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        if 'file' not in request.files:
+            return {"error": "No file provided"}, 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return {"error": "No file selected"}, 400
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            user.profile_photo = filename
+            db.session.commit()
+            return {"message": "Profile photo uploaded successfully"}, 201
+        else:
+            return {"error": "File type not allowed"}, 400
+
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        profile_photo_url = user.get_profile_photo_url()
+        if not profile_photo_url:
+            return {"error": "No profile photo found"}, 404
+
+        return send_from_directory(app.config['UPLOAD_FOLDER'], user.profile_photo)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
+
+
+
+
+
+
+
 
 
 
@@ -181,7 +345,11 @@ def auth():
         if not user or not user.check_password(password):
             return {"error": "Invalid credentials"}, 401
 
-        return {"message": "Logged in successfully", "user": user.to_dict()}, 200
+        # Added fetching user's followers
+        user_followers = [follow.follower.to_dict() for follow in user.followers]
+        user_data = user.to_dict()
+        user_data['followers'] = user_followers
+        return {"message": "Logged in successfully", "user": user_data}, 200
     elif action == 'signup':
         if not email:
             return {"error": "Email is required for signup"}, 400
@@ -199,10 +367,14 @@ def auth():
         db.session.add(user)
         db.session.commit()
 
-        return {"message": "User created successfully", "user": user.to_dict()}, 201
+        # Added fetching user's followers
+        user_followers = [follow.follower.to_dict() for follow in user.followers]
+        user_data = user.to_dict()
+        user_data['followers'] = user_followers
+
+        return {"message": "User created successfully", "user": user_data}, 201
     else:
         return {"error": "Invalid action"}, 400
-
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -261,10 +433,6 @@ def logout_user_route():
     logout_user()
     return {"message": "Logged out successfully"}, 200
 
-
-
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-
 

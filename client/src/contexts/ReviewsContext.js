@@ -8,7 +8,7 @@ export const ReviewsContextProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
 
   const addReview = (newReview) => {
-    return fetch('http://127.0.0.1:5555/reviews', {
+    return fetch('/reviews', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -23,7 +23,7 @@ export const ReviewsContextProvider = ({ children }) => {
   };
 
   const editReview = (id, updatedReview) => {
-    return fetch(`http://127.0.0.1:5555/reviews/${id}`, {
+    return fetch(`/reviews/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ export const ReviewsContextProvider = ({ children }) => {
   
 
   const deleteReview = (id) => {
-    return fetch(`http://127.0.0.1:5555/reviews/${id}`, {
+    return fetch(`/reviews/${id}`, {
       method: 'DELETE'
     })
       .then(response => {
@@ -48,7 +48,7 @@ export const ReviewsContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5555/reviews')
+    fetch('/reviews')
       .then(response => response.json())
       .then(data => {
         setReviews(data);

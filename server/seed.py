@@ -53,19 +53,22 @@
 #         seed_data()
 
 from datetime import datetime
-from app import app, db, bcrypt
+from app import app, db
 from models import User, Walk, Review, Follow
+import bcrypt
 
 def seed_data():
 
     db.drop_all()
     db.create_all()
 
-    # Create some users
-    vanessa = User(username='vanessa', email='vanessa@email.com', password='password1')
-    kim = User(username='kim', email='kim@email.com', password='password2')
-    kevin = User(username='kevin', email='kevin@email.com', password='password3')
-   
+    vanessa_password = bcrypt.hashpw('password1'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    kim_password = bcrypt.hashpw('password2'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    kevin_password = bcrypt.hashpw('password3'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password)
+    kim = User(username='kim', email='kim@email.com', password_hash=kim_password)
+    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password)
 
     db.session.add_all([vanessa, kim, kevin])
     db.session.commit()
