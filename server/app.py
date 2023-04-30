@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 import secrets
 from flask import request, jsonify, session, send_from_directory
 from flask_restful import Resource
@@ -45,6 +34,23 @@ def add_header(response):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 
 class Home(Resource):
@@ -97,23 +103,6 @@ class UserResource(Resource):
 
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
 
-
-class UserProfileResource(Resource):
-    @login_required
-    def get(self, user_id):
-        user = User.query.get(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
-        return user.to_dict()
-api.add_resource(UserProfileResource, '/users/<int:user_id>/profile')
-
-
-
-
-
-
-
-
 class WalkResource(Resource):
     def get(self, walk_id=None):
         if walk_id:
@@ -136,24 +125,6 @@ class WalkResource(Resource):
         db.session.commit()
 
         return {"message": "Walk created successfully"}, 201
-
-    def put(self, walk_id):
-        walk = Walk.query.get(walk_id)
-        if walk:
-            updated_data = request.json
-            for key, value in updated_data.items():
-                setattr(walk, key, value)
-            db.session.commit()
-            return walk.to_dict()
-        return {"error": "Walk not found"}, 404
-
-    def delete(self, walk_id):
-        walk = Walk.query.get(walk_id)
-        if walk:
-            db.session.delete(walk)
-            db.session.commit()
-            return {"message": "Walk deleted successfully"}
-        return {"error": "Walk not found"}, 404
 
 api.add_resource(WalkResource, '/walks', '/walks/<int:walk_id>')
 
@@ -185,58 +156,49 @@ class UserProfilePhotoResource(Resource):
         if not user:
             return {"error": "User not found"}, 404
 
-        profile_photo_url = user.get_profile_photo_url()
-        if not profile_photo_url:
+        if not user.profile_photo:
             return {"error": "No profile photo found"}, 404
 
         return send_from_directory(app.config['UPLOAD_FOLDER'], user.profile_photo)
 
+api.add_resource(UserProfilePhotoResource, '/users/<int:user_id>/profile_photo')
+
+
+
+
+reviews = []
+
 class ReviewResource(Resource):
     def get(self):
-        reviews = Review.query.all()
-        return [review.to_dict() for review in reviews]
+        return reviews
 
     def post(self):
-        name = request.json.get('name')
-        text = request.json.get('text')
-        rating = request.json.get('rating')
-        user_id = request.json.get('user_id')
-        walk_id = request.json.get('walk_id')
-
-        if not name or not text or not rating or not user_id or not walk_id:
-            return {"error": "All fields are required"}, 400
-
-        review = Review(name=name, text=text, rating=rating, user_id=user_id, walk_id=walk_id)
-        db.session.add(review)
-        db.session.commit()
-
-        return {"message": "Review created successfully"}, 201
+        review = request.json
+        review['id'] = len(reviews) + 1
+        reviews.append(review)
+        return review, 201
 
 class ReviewByIdResource(Resource):
-    def get(self, review_id):
-        review = Review.query.get(review_id)
-        return review.to_dict() if review else {"error": "Review not found"}, 404
+    def find_review(self, review_id):
+        return next((r for r in reviews if r['id'] == review_id), None)
 
     def patch(self, review_id):
-        review = Review.query.get(review_id)
+        review = self.find_review(review_id)
         if review:
             updated_data = request.json
-            for key, value in updated_data.items():
-                setattr(review, key, value)
-            db.session.commit()
-            return review.to_dict()
-        return {"error": "Review not found"}, 404
+            review.update(updated_data)
+            return review
+        return {'error': 'Review not found'}, 404
 
     def delete(self, review_id):
-        review = Review.query.get(review_id)
-        if review:
-            db.session.delete(review)
-            db.session.commit()
-            return {"message": "Review deleted successfully"}
-        return {"error": "Review not found"}, 404
+        global reviews
+        reviews = [r for r in reviews if r['id'] != review_id]
+        return {'result': 'Review deleted'}
 
 api.add_resource(ReviewResource, '/reviews')
 api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
+
+
 
 class FollowResource(Resource):
     def get(self, follow_id=None):
@@ -259,74 +221,7 @@ class FollowResource(Resource):
 
         return {"message": "Follow created successfully"}, 201
 
-
-class FollowingResource(Resource):
-    def get(self, user_id):
-        user = User.query.get(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
-
-        following = [follow.followed.to_dict() for follow in user.followed]
-        return jsonify(following)
-
-api.add_resource(FollowingResource, '/users/<int:user_id>/following')
 api.add_resource(FollowResource, '/follows', '/follows/<int:follow_id>')
-
-
-class UserProfilePhotoResource(Resource):
-    def post(self, user_id):
-        user = User.query.get(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
-
-        if 'file' not in request.files:
-            return {"error": "No file provided"}, 400
-
-        file = request.files['file']
-        if file.filename == '':
-            return {"error": "No file selected"}, 400
-
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            user.profile_photo = filename
-            db.session.commit()
-            return {"message": "Profile photo uploaded successfully"}, 201
-        else:
-            return {"error": "File type not allowed"}, 400
-
-    def get(self, user_id):
-        user = User.query.get(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
-
-        profile_photo_url = user.get_profile_photo_url()
-        if not profile_photo_url:
-            return {"error": "No profile photo found"}, 404
-
-        return send_from_directory(app.config['UPLOAD_FOLDER'], user.profile_photo)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
-
-
-@app.after_request
-def add_header(response):
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    return response
-
-
-
-
-
-
-
-
 
 
 
@@ -435,4 +330,12 @@ def logout_user_route():
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+
+
+
+
+
+
+
 
