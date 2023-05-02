@@ -58,7 +58,7 @@ function Reviews() {
   const [reviews, setReviews] = useState([]);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState('');
-  const [reviewLocation, setReviewLocation] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
   const [editReviewId, setEditReviewId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -150,23 +150,23 @@ function Reviews() {
       text: reviewText,
       rating: reviewRating,
       user_id: user.id,
-      location: reviewLocation,
+      comment: reviewComment,
     };
     try {
       await addReview(newReview);
       setReviewText('');
       setReviewRating('');
-      setReviewLocation('');
+      setReviewComment('');
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleEdit = (id, text, rating, location) => {
+  const handleEdit = (id, text, rating,comment) => {
     setEditReviewId(id);
     setReviewText(text);
     setReviewRating(rating);
-    setReviewLocation(location);
+    setReviewComment(comment);
     setOpenDialog(true);
   };
 
@@ -175,7 +175,7 @@ function Reviews() {
     setEditReviewId(null);
     setReviewText('');
     setReviewRating('');
-    setReviewLocation('');
+    setReviewComment('');
   };
 
   const handleSaveEdit = async (event) => {
@@ -185,7 +185,7 @@ function Reviews() {
       text: reviewText,
       rating: reviewRating,
       user_id: user.id,
-      location: reviewLocation,
+      comment: reviewComment,
     };
     try {
       await editReview(editReviewId, updatedReview);
@@ -193,7 +193,7 @@ function Reviews() {
       setEditReviewId(null);
       setReviewText('');
       setReviewRating('');
-      setReviewLocation('');
+      setReviewComment('');
     } catch (error) {
       console.error(error);
     }
@@ -234,8 +234,8 @@ function Reviews() {
         </RatingStyled>
         <TextFieldStyled
           label="Location"
-          value={reviewLocation}
-          onChange={(event) => setReviewLocation(event.target.value)}
+          value={reviewComment}
+          onChange={(event) => setReviewComment(event.target.value)}
         />
         <SubmitButton type="submit" variant="contained" color="primary">
           Submit Review
@@ -297,8 +297,8 @@ function Reviews() {
               </RatingStyled>
               <TextFieldStyled
                 label="Location"
-                value={reviewLocation}
-                onChange={(event) => setReviewLocation(event.target.value)}
+                value={reviewComment}
+                onChange={(event) => setReviewComment(event.target.value)}
               />
               <DialogActions>
                 <SubmitButton type="submit" variant="contained" color="primary">
