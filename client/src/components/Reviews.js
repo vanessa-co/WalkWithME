@@ -18,6 +18,7 @@ import { styled } from '@mui/system';
 import OpenStreetMapLocation from './OpenStreetMapLocation';
 import 'leaflet/dist/leaflet.css';
 import { AuthContext } from '../contexts/AuthContext';
+import Cookies from 'js-cookie';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -59,6 +60,7 @@ function Reviews() {
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState('');
   const [reviewLocation, setReviewLocation] = useState('');
+  const [reviewWalkId, setReviewWalkId] = useState('');
   const [editReviewId, setEditReviewId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -108,6 +110,7 @@ function Reviews() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('auth_token')}`,
         },
         body: JSON.stringify({
           ...updatedReview,
@@ -147,6 +150,7 @@ function Reviews() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const newReview = {
+      walk_id: reviewWalkId,
       text: reviewText,
       rating: reviewRating,
       user_id: user.id,

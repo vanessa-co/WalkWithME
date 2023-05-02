@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import CustomToast from './CustomToast';
 import { Navbar as BootstrapNavbar, Nav, Button } from 'react-bootstrap';
+import Cookies from 'js-cookie';
 
 function Navbar() {
   const { user, setUser } = useContext(AuthContext);
@@ -13,7 +14,10 @@ function Navbar() {
   const handleLogout = async () => {
     const response = await fetch('/logout', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Cookies.get('auth_token')}`,
+      },
       body: JSON.stringify({ user }),
     });
 

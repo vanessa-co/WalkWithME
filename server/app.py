@@ -1,3 +1,5 @@
+import jwt
+from datetime import datetime, timedelta
 import secrets
 from flask import request, jsonify, session, send_from_directory
 from flask_restful import Resource
@@ -7,6 +9,9 @@ import bcrypt
 from werkzeug.utils import secure_filename
 import os
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+
+SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2ODMxMjcwOTl9.11dgLQ5_-YkqCDUPa5R-3KUhzc6kak3wh-5QOpyaAb4'
+EXPIRATION_TIME = 60 * 60 * 24
 
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
@@ -30,7 +35,15 @@ def add_header(response):
     response.headers['Cache-Control'] = 'public, max-age=0'
     return response
 
-# Helper function to check if a file is allowed
+
+def generate_token(user_id):
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.utcnow() + timedelta(seconds=EXPIRATION_TIME),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -262,11 +275,12 @@ def auth():
         if not user or not user.check_password(password):
             return {"error": "Invalid credentials"}, 401
 
-        # Added fetching user's followers
+        token = generate_token(user.id)
+
         user_followers = [follow.follower.to_dict() for follow in user.followers]
         user_data = user.to_dict()
         user_data['followers'] = user_followers
-        return {"message": "Logged in successfully", "user": user_data}, 200
+        return {"message": "Logged in successfully", "user": user_data, "token": token}, 200
     elif action == 'signup':
         if not email:
             return {"error": "Email is required for signup"}, 400
@@ -284,14 +298,17 @@ def auth():
         db.session.add(user)
         db.session.commit()
 
-        # Added fetching user's followers
+        token = generate_token(user.id)
+
         user_followers = [follow.follower.to_dict() for follow in user.followers]
         user_data = user.to_dict()
         user_data['followers'] = user_followers
 
-        return {"message": "User created successfully", "user": user_data}, 201
+        return {"message": "User created successfully", "user": user_data, "token": token}, 201
     else:
         return {"error": "Invalid action"}, 400
+
+
 
 @app.route('/logout', methods=['POST'])
 def logout():
