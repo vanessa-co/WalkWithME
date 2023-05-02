@@ -59,7 +59,7 @@ function Reviews() {
   const [reviews, setReviews] = useState([]);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState('');
-  const [reviewLocation, setReviewLocation] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
   const [reviewWalkId, setReviewWalkId] = useState('');
   const [editReviewId, setEditReviewId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -150,27 +150,27 @@ function Reviews() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const newReview = {
-      walk_id: reviewWalkId,
       text: reviewText,
       rating: reviewRating,
       user_id: user.id,
-      location: reviewLocation,
+      comment: reviewComment,
+      walk_id: 1,
     };
     try {
       await addReview(newReview);
       setReviewText('');
       setReviewRating('');
-      setReviewLocation('');
+      setReviewComment('');
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleEdit = (id, text, rating, location) => {
+  const handleEdit = (id, text, rating, comment) => {
     setEditReviewId(id);
     setReviewText(text);
     setReviewRating(rating);
-    setReviewLocation(location);
+    setReviewComment(comment);
     setOpenDialog(true);
   };
 
@@ -179,25 +179,26 @@ function Reviews() {
     setEditReviewId(null);
     setReviewText('');
     setReviewRating('');
-    setReviewLocation('');
+    setReviewComment('');
   };
 
   const handleSaveEdit = async (event) => {
     event.preventDefault();
     const updatedReview = {
       id: editReviewId,
-      text: reviewText,
+      comment: reviewText,
       rating: reviewRating,
       user_id: user.id,
-      location: reviewLocation,
+      location: reviewComment,
     };
+    
     try {
       await editReview(editReviewId, updatedReview);
       setOpenDialog(false);
       setEditReviewId(null);
       setReviewText('');
       setReviewRating('');
-      setReviewLocation('');
+      setReviewComment('');
     } catch (error) {
       console.error(error);
     }
@@ -238,8 +239,8 @@ function Reviews() {
         </RatingStyled>
         <TextFieldStyled
           label="Location"
-          value={reviewLocation}
-          onChange={(event) => setReviewLocation(event.target.value)}
+          value={reviewComment}
+          onChange={(event) => setReviewComment(event.target.value)}
         />
         <SubmitButton type="submit" variant="contained" color="primary">
           Submit Review
@@ -253,10 +254,10 @@ function Reviews() {
           <Typography variant="h6">Review by User {review.user_id}</Typography>
           <Rating value={review.rating} readOnly />
           <Typography>{review.text}</Typography>
-          {review.location && review.location.lat && review.location.lng && (
+          {review.comment && review.comment.lat && review.comment.lng && (
             <>
               <Typography>
-                Location: {review.location.lat}, {review.location.lng}
+                Location: {review.comment.lat}, {review.comment.lng}
               </Typography>
               <OpenStreetMapLocation location={review.location} />
             </>
@@ -264,7 +265,7 @@ function Reviews() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => handleEdit(review.id, review.text, review.rating, review.location)}
+            onClick={() => handleEdit(review.id, review.text, review.rating, review.comment)}
           >
             Edit Review
           </Button>
@@ -301,8 +302,8 @@ function Reviews() {
               </RatingStyled>
               <TextFieldStyled
                 label="Location"
-                value={reviewLocation}
-                onChange={(event) => setReviewLocation(event.target.value)}
+                value={reviewComment}
+                onChange={(event) => setReviewComment(event.target.value)}
               />
               <DialogActions>
                 <SubmitButton type="submit" variant="contained" color="primary">
