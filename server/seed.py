@@ -3,8 +3,11 @@ from datetime import datetime
 from app import app, db
 from models import User, Walk, Review, Follow
 import bcrypt
+import random
+from faker import Faker
 
 def seed_data():
+    fake = Faker()
 
     db.drop_all()
     db.create_all()
@@ -13,12 +16,31 @@ def seed_data():
     kim_password = bcrypt.hashpw('password2'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     kevin_password = bcrypt.hashpw('password3'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password)
-    kim = User(username='kim', email='kim@email.com', password_hash=kim_password)
-    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password)
+    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password, profile_photo='https://www.lombardvet.com/sites/default/files/styles/large/public/golden-retriever-dog-breed-info_0.jpg?itok=sYARdO3q')
+    kim = User(username='kim', email='kim@email.com', password_hash=kim_password, profile_photo='https://static.wixstatic.com/media/237a38_78996c492b2741638f2a43b3a272159c~mv2.jpg/v1/fill/w_640,h_400,al_t,q_80,usm_0.66_1.00_0.01,enc_auto/237a38_78996c492b2741638f2a43b3a272159c~mv2.jpg')
+    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password, profile_photo='https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2022-08/220805-border-collie-play-mn-1100-82d2f1.jpg')
 
     db.session.add_all([vanessa, kim, kevin])
     db.session.commit()
+
+    
+
+
+  # Faker user data
+    fake = Faker()
+    fake_users = []
+    for i in range(10):
+        username = fake.user_name()
+        email = fake.email()
+        password_hash = bcrypt.hashpw(fake.password().encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        profile_photo = fake.image_url()
+        user = User(username=username, email=email, password_hash=password_hash, profile_photo=profile_photo)
+        fake_users.append(user)
+
+    db.session.add_all(fake_users)
+    db.session.commit()
+
+    users = User.query.all()
 
     # Walks for Vanessa
     vanessa_walk1 = Walk(name="Central Park Walk", location='Central Park', distance=2.5, photo='https://i.natgeofe.com/n/15ec8dec-df7c-45af-a0ae-08d4e906a134/belvedere-castle.jpg?w=2880&h=2160', user_id=vanessa.id)
@@ -51,10 +73,42 @@ def seed_data():
     db.session.add_all([vanessa_review1, vanessa_review2, kim_review1, kim_review2, kevin_review1, kevin_review2])
     db.session.commit()
 
-    # Have kim follow vanessa
-    kim_follow_vanessa = Follow(follower_id=kim.id, followed_id=vanessa.id)
-    db.session.add(kim_follow_vanessa)
+
+
+
+    # follows = []
+    # for i in range(30):
+    #     follower_id = fake.random_int(min=1, max=10)
+    #     followed_id = fake.random_int(min=1, max=10)
+    #     # Ensure that follower and followed are not the same user
+    #     while followed_id == follower_id:
+    #         followed_id = fake.random_int(min=1, max=10)
+    #     follow = Follow(follower_id=follower_id, followed_id=followed_id)
+    #     follows.append(follow)
+    # db.session.add_all(follows)
+    # db.session.commit()
+
+
+
+    follows = []
+    for i in range(30):
+        follower = random.choice(users)
+        followed = random.choice(users)
+        # Ensure that follower and followed are not the same user
+        while followed == follower:
+            followed = random.choice(users)
+        follow = Follow(follower_id=follower.id, follower_username=follower.username,
+                    followed_id=followed.id, followed_username=followed.username)
+        follows.append(follow)
+
+    db.session.add_all(follows)
     db.session.commit()
+
+
+
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():

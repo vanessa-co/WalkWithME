@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useContext } from 'react';
 
 import {
@@ -18,6 +16,7 @@ import { styled } from '@mui/system';
 import OpenStreetMapLocation from './OpenStreetMapLocation';
 import 'leaflet/dist/leaflet.css';
 import { AuthContext } from '../contexts/AuthContext';
+import Cookies from 'js-cookie';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -59,6 +58,7 @@ function Reviews() {
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState('');
   const [reviewComment, setReviewComment] = useState('');
+  const [reviewWalkId, setReviewWalkId] = useState('');
   const [editReviewId, setEditReviewId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -108,6 +108,7 @@ function Reviews() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('auth_token')}`,
         },
         body: JSON.stringify({
           ...updatedReview,
@@ -151,6 +152,7 @@ function Reviews() {
       rating: reviewRating,
       user_id: user.id,
       comment: reviewComment,
+      walk_id: 1,
     };
     try {
       await addReview(newReview);
@@ -162,7 +164,7 @@ function Reviews() {
     }
   };
 
-  const handleEdit = (id, text, rating,comment) => {
+  const handleEdit = (id, text, rating, comment) => {
     setEditReviewId(id);
     setReviewText(text);
     setReviewRating(rating);
@@ -182,11 +184,12 @@ function Reviews() {
     event.preventDefault();
     const updatedReview = {
       id: editReviewId,
-      text: reviewText,
+      comment: reviewText,
       rating: reviewRating,
       user_id: user.id,
-      comment: reviewComment,
+      location: reviewComment,
     };
+    
     try {
       await editReview(editReviewId, updatedReview);
       setOpenDialog(false);
@@ -249,10 +252,10 @@ function Reviews() {
           <Typography variant="h6">Review by User {review.user_id}</Typography>
           <Rating value={review.rating} readOnly />
           <Typography>{review.text}</Typography>
-          {review.location && review.location.lat && review.location.lng && (
+          {review.comment && review.comment.lat && review.comment.lng && (
             <>
               <Typography>
-                Location: {review.location.lat}, {review.location.lng}
+                Location: {review.comment.lat}, {review.comment.lng}
               </Typography>
               <OpenStreetMapLocation location={review.location} />
             </>
@@ -260,7 +263,7 @@ function Reviews() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => handleEdit(review.id, review.text, review.rating, review.location)}
+            onClick={() => handleEdit(review.id, review.text, review.rating, review.comment)}
           >
             Edit Review
           </Button>

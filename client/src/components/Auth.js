@@ -1,7 +1,7 @@
-
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -35,18 +35,19 @@ const Auth = () => {
         throw new Error(responseData.error);
       }
 
-      const data = await response.json();
-      console.log(data);
+      const { token, user: userData } = await response.json();
+      console.log(userData);
+      Cookies.set('auth_token', token);
 
       if (isLogin) {
-        setUser(data.user);
+        setUser(userData);
       } else {
-        setUser(data.user); // Set user state after signing up
-        setIsLogin(true); // Switch back to the login form
+        setUser(userData);
+        setIsLogin(true);
       }
 
-      if (data.user) {
-        navigate('/'); // Navigate to the home page after successful login or signup
+      if (userData) {
+        navigate('/');
       }
     } catch (err) {
       setError(err.message);
@@ -97,6 +98,7 @@ const Auth = () => {
 };
 
 export default Auth;
+
 
 
 
