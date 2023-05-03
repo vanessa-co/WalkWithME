@@ -16,21 +16,24 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     profile_photo = db.Column(db.String, nullable=True)
+    # profile=db.Colum(db.String, nullable=False)
     walks = db.relationship('Walk', back_populates='user', lazy=True)
     reviews = db.relationship('Review', back_populates='user', lazy=True)
     followed = association_proxy('followed_assoc', 'followed')
     followers = association_proxy('followers_assoc', 'follower')
 
 
-    def __init__(self, username, email, password=None, password_hash=None):
-        self.username = username
-        self.email = email
-        if password:
-            self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        elif password_hash:
-            self.password_hash = password_hash
-        else:
-            raise ValueError("Either 'password' or 'password_hash' argument must be provided")
+    def __init__(self, username, email, password=None, password_hash=None, profile_photo=None):
+     self.username = username
+     self.email = email
+     if password:
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+     elif password_hash:
+        self.password_hash = password_hash
+     else:
+        raise ValueError("Either 'password' or 'password_hash' argument must be provided")
+     self.profile_photo = profile_photo
+
 
     @validates('email')
     def validate_email(self, key, email):
@@ -47,13 +50,18 @@ class User(db.Model, SerializerMixin):
         if self.profile_photo:
             return f'/users/{self.id}/profile_photo'
         return None
-
+    
+    # def get_profile(self):
+    #     if self.profile:
+    #         return f'/users/{self.id}/profile'
+    #     return None
+    
     def to_dict(self, include_followers=False):
         user_data = {
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "profile_photo": self.get_profile_photo_url(),
+            'profile_photo': self.get_profile_photo_url() if self.profile_photo else None
         }
         if include_followers:
             user_data["followers"] = [follower.to_dict() for follower in self.followers]
@@ -93,7 +101,7 @@ class Walk(db.Model, SerializerMixin):
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
-    id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     text = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     walk_id = db.Column(db.Integer, db.ForeignKey('walks.id'), nullable=False)
@@ -129,7 +137,7 @@ class Follow(db.Model, SerializerMixin):
     def to_dict(self):
         return {
             "id": self.id,
-            "follower": self.follower_id,
-            "followed": self.followed_id,
+            "follower": self.follower.username,
+            "followed": self.followed.username,
         }
 

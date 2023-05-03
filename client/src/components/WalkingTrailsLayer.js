@@ -1,4 +1,3 @@
-// src/components/WalkingTrailsLayer.js
 import React, { useEffect, useState } from 'react';
 import { GeoJSON } from 'react-leaflet';
 import { fetchWalkingTrails } from '../utils/fetchWalkingTrails';

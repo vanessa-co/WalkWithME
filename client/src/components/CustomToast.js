@@ -1,5 +1,5 @@
 import React from 'react';
-import './style.css'; // Import the CSS file
+import './style.css'; 
 
 const CustomToast = ({ message, imageSrc }) => {
   return (

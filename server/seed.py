@@ -13,9 +13,9 @@ def seed_data():
     kim_password = bcrypt.hashpw('password2'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     kevin_password = bcrypt.hashpw('password3'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password)
-    kim = User(username='kim', email='kim@email.com', password_hash=kim_password)
-    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password)
+    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password, profile_photo='https://www.lombardvet.com/sites/default/files/styles/large/public/golden-retriever-dog-breed-info_0.jpg?itok=sYARdO3q')
+    kim = User(username='kim', email='kim@email.com', password_hash=kim_password, profile_photo='https://static.wixstatic.com/media/237a38_78996c492b2741638f2a43b3a272159c~mv2.jpg/v1/fill/w_640,h_400,al_t,q_80,usm_0.66_1.00_0.01,enc_auto/237a38_78996c492b2741638f2a43b3a272159c~mv2.jpg')
+    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password, profile_photo='https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2022-08/220805-border-collie-play-mn-1100-82d2f1.jpg')
 
     db.session.add_all([vanessa, kim, kevin])
     db.session.commit()
@@ -53,7 +53,8 @@ def seed_data():
 
     # Have kim follow vanessa
     kim_follow_vanessa = Follow(follower_id=kim.id, followed_id=vanessa.id)
-    db.session.add(kim_follow_vanessa)
+    kevin_follow_vanessa =Follow(follower_id=kevin.id, followed_id=vanessa.id)
+    db.session.add(kim_follow_vanessa, kevin_follow_vanessa)
     db.session.commit()
 
 if __name__ == '__main__':
