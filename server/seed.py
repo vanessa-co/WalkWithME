@@ -76,19 +76,6 @@ def seed_data():
 
 
 
-    # follows = []
-    # for i in range(30):
-    #     follower_id = fake.random_int(min=1, max=10)
-    #     followed_id = fake.random_int(min=1, max=10)
-    #     # Ensure that follower and followed are not the same user
-    #     while followed_id == follower_id:
-    #         followed_id = fake.random_int(min=1, max=10)
-    #     follow = Follow(follower_id=follower_id, followed_id=followed_id)
-    #     follows.append(follow)
-    # db.session.add_all(follows)
-    # db.session.commit()
-
-
 
     follows = []
     for i in range(30):
