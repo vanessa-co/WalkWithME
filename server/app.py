@@ -316,7 +316,12 @@ def auth():
 
         token = generate_token(user.id)
 
-        user_followers = [follow.follower.to_dict() for follow in user.followers]
+        # user_followers = [follow.follower.to_dict() for follow in user.followers]
+        # Get the followers for the user
+        user_followers = [follow.follower.to_dict() for follow in user.followers_assoc]
+        # Get the users that the user is following
+        # user_following = [follow.followed.to_dict() for follow in user.followed_assoc]
+
         user_data = user.to_dict()
         user_data['followers'] = user_followers
         return {"message": "Logged in successfully", "user": user_data, "token": token}, 200

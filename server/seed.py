@@ -3,8 +3,11 @@ from datetime import datetime
 from app import app, db
 from models import User, Walk, Review, Follow
 import bcrypt
+import random
+from faker import Faker
 
 def seed_data():
+    fake = Faker()
 
     db.drop_all()
     db.create_all()
@@ -19,6 +22,25 @@ def seed_data():
 
     db.session.add_all([vanessa, kim, kevin])
     db.session.commit()
+
+    
+
+
+  # Faker user data
+    fake = Faker()
+    fake_users = []
+    for i in range(10):
+        username = fake.user_name()
+        email = fake.email()
+        password_hash = bcrypt.hashpw(fake.password().encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        profile_photo = fake.image_url()
+        user = User(username=username, email=email, password_hash=password_hash, profile_photo=profile_photo)
+        fake_users.append(user)
+
+    db.session.add_all(fake_users)
+    db.session.commit()
+
+    users = User.query.all()
 
     # Walks for Vanessa
     vanessa_walk1 = Walk(name="Central Park Walk", location='Central Park', distance=2.5, photo='https://i.natgeofe.com/n/15ec8dec-df7c-45af-a0ae-08d4e906a134/belvedere-castle.jpg?w=2880&h=2160', user_id=vanessa.id)
@@ -51,11 +73,42 @@ def seed_data():
     db.session.add_all([vanessa_review1, vanessa_review2, kim_review1, kim_review2, kevin_review1, kevin_review2])
     db.session.commit()
 
-    # Have kim follow vanessa
-    kim_follow_vanessa = Follow(follower_id=kim.id, followed_id=vanessa.id)
-    kevin_follow_vanessa =Follow(follower_id=kevin.id, followed_id=vanessa.id)
-    db.session.add(kim_follow_vanessa, kevin_follow_vanessa)
+
+
+
+    # follows = []
+    # for i in range(30):
+    #     follower_id = fake.random_int(min=1, max=10)
+    #     followed_id = fake.random_int(min=1, max=10)
+    #     # Ensure that follower and followed are not the same user
+    #     while followed_id == follower_id:
+    #         followed_id = fake.random_int(min=1, max=10)
+    #     follow = Follow(follower_id=follower_id, followed_id=followed_id)
+    #     follows.append(follow)
+    # db.session.add_all(follows)
+    # db.session.commit()
+
+
+
+    follows = []
+    for i in range(30):
+        follower = random.choice(users)
+        followed = random.choice(users)
+        # Ensure that follower and followed are not the same user
+        while followed == follower:
+            followed = random.choice(users)
+        follow = Follow(follower_id=follower.id, follower_username=follower.username,
+                    followed_id=followed.id, followed_username=followed.username)
+        follows.append(follow)
+
+    db.session.add_all(follows)
     db.session.commit()
+
+
+
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():

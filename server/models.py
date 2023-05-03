@@ -1,22 +1,19 @@
+
+
 import bcrypt
-import uuid
-from datetime import datetime
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 from config import db
-from email_validator import validate_email, EmailNotValidError
 from sqlalchemy_serializer import SerializerMixin
-
 
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     profile_photo = db.Column(db.String, nullable=True)
-    # profile=db.Colum(db.String, nullable=False)
     walks = db.relationship('Walk', back_populates='user', lazy=True)
     reviews = db.relationship('Review', back_populates='user', lazy=True)
     followed = association_proxy('followed_assoc', 'followed')
@@ -35,13 +32,11 @@ class User(db.Model, SerializerMixin):
      self.profile_photo = profile_photo
 
 
-    @validates('email')
-    def validate_email(self, key, email):
-        try:
-            validate_email(email)
-        except EmailNotValidError:
-            raise ValueError('Invalid email address')
-        return email
+    @validates('password')
+    def validate_password(self, key, password):
+        if len(password) < 3:
+            raise ValueError('Password must be at least 3 characters long')
+        return password
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
@@ -50,11 +45,6 @@ class User(db.Model, SerializerMixin):
         if self.profile_photo:
             return f'/users/{self.id}/profile_photo'
         return None
-    
-    # def get_profile(self):
-    #     if self.profile:
-    #         return f'/users/{self.id}/profile'
-    #     return None
     
     def to_dict(self, include_followers=False):
         user_data = {
@@ -73,6 +63,12 @@ class User(db.Model, SerializerMixin):
     
     def get_followed(self):
         return [followed.to_dict() for followed in self.followed]
+
+
+
+
+
+
 
 
 
@@ -120,24 +116,29 @@ class Review(db.Model, SerializerMixin):
 
         }
 
-class Follow(db.Model, SerializerMixin):
+
+class Follow(db.Model):
     __tablename__ = 'follows'
 
     id = db.Column(db.Integer, primary_key=True)
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    follower_username = db.Column(db.String(80), nullable=False)
+    followed_username = db.Column(db.String(80), nullable=False)
 
     follower = db.relationship('User', foreign_keys=[follower_id], backref=db.backref('followers_assoc', lazy='dynamic'))
     followed = db.relationship('User', foreign_keys=[followed_id], backref=db.backref('followed_assoc', lazy='dynamic'))
 
-
     def __repr__(self):
-        return f'<Follow {self.follower_id} is following {self.followed_id}>'
+        return f'<Follow {self.follower_username} is following {self.followed_username}>'
 
     def to_dict(self):
         return {
             "id": self.id,
-            "follower": self.follower.username,
-            "followed": self.followed.username,
+            "follower_id": self.follower_id,
+            "follower_username": self.follower_username,
+            "followed_id": self.followed_id,
+            "followed_username": self.followed_username,
         }
+
 
