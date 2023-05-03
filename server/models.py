@@ -1,5 +1,3 @@
-
-
 import bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -66,13 +64,6 @@ class User(db.Model, SerializerMixin):
 
 
 
-
-
-
-
-
-
-
 class Walk(db.Model, SerializerMixin):
     __tablename__ = 'walks'
     id = db.Column(db.Integer, primary_key=True)
@@ -117,6 +108,7 @@ class Review(db.Model, SerializerMixin):
         }
 
 
+
 class Follow(db.Model):
     __tablename__ = 'follows'
 
@@ -128,6 +120,8 @@ class Follow(db.Model):
 
     follower = db.relationship('User', foreign_keys=[follower_id], backref=db.backref('followers_assoc', lazy='dynamic'))
     followed = db.relationship('User', foreign_keys=[followed_id], backref=db.backref('followed_assoc', lazy='dynamic'))
+
+    __table_args__ = (db.UniqueConstraint('follower_id', 'followed_id', name='_follower_followed_uc'),)
 
     def __repr__(self):
         return f'<Follow {self.follower_username} is following {self.followed_username}>'

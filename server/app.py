@@ -261,54 +261,16 @@ api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
 
 
 
-# class FollowerResource(Resource):
-#     def get(self, user_id):
-#         user = User.query.get(user_id)
-#         if not user:
-#             return {"error": "User not found"}, 404
-#         followers = [follow.follower.to_dict() for follow in user.followers]
-#         return followers
-
-
-# api.add_resource(FollowerResource, '/api/users/<int:user_id>/followers')
-
-
-# class FollowResource(Resource):
-#     def get(self, follow_id=None):
-#         if follow_id:
-#             follow = Follow.query.get(follow_id)
-#             return follow.to_dict() if follow else {"error": "Follow not found"}, 404
-#         follows = Follow.query.all()
-#         return [follow.to_dict() for follow in follows]
-
-
-#     def post(self):
-#         follower_id = request.json.get('follower_id')
-#         followed_id = request.json.get('followed_id')
-
-#         if not follower_id or not followed_id:
-#             return {"error": "Follower_id and followed_id are required fields"}, 400
-
-#         follow = Follow(follower_id=follower_id, followed_id=followed_id)
-#         db.session.add(follow)
-#         db.session.commit()
-
-#         return {"message": "Follow created successfully"}, 201
-
-# api.add_resource(FollowResource, '/follows', '/follows/<int:follow_id>')
-
-
-
-
 class FollowerResource(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
-        followers = [follow.follower.to_dict() for follow in user.followers]
+        followers = [follow.follower.to_dict() for follow in user.followed_assoc]
         return followers
 
 api.add_resource(FollowerResource, '/api/users/<int:user_id>/followers')
+
 
 
 class FollowResource(Resource):
@@ -319,22 +281,37 @@ class FollowResource(Resource):
         follows = Follow.query.all()
         return [follow.to_dict() for follow in follows]
 
-    def post(self):
+    class FollowResource(Resource):
+
+     def post(self):
         follower_id = request.json.get('follower_id')
         followed_id = request.json.get('followed_id')
 
         if not follower_id or not followed_id:
             return {"error": "Follower_id and followed_id are required fields"}, 400
 
-        follow = Follow(follower_id=follower_id, followed_id=followed_id)
+        existing_follow = Follow.query.filter_by(follower_id=follower_id, followed_id=followed_id).first()
+        if existing_follow:
+            return {"error": "User is already followed"}, 400
+
+        follower = User.query.get(follower_id)
+        followed = User.query.get(followed_id)
+
+        if not follower or not followed:
+            return {"error": "Follower or followed user not found"}, 404
+
+        follow = Follow(follower_id=follower_id, followed_id=followed_id, 
+                        follower_username=follower.username, followed_username=followed.username)
         db.session.add(follow)
         db.session.commit()
 
         return {"message": "Follow created successfully"}, 201
 
+
+
     def follow(self, follower_id, followed_id):
-        follow = Follow.query.filter_by(follower_id=follower_id, followed_id=followed_id).first()
-        if not follow:
+        existing_follow = Follow.query.filter_by(follower_id=follower_id, followed_id=followed_id).first()
+        if not existing_follow:
             follow = Follow(follower_id=follower_id, followed_id=followed_id)
             db.session.add(follow)
             db.session.commit()
@@ -350,8 +327,6 @@ class FollowResource(Resource):
         return {"error": "User is not followed"}, 404
 
 api.add_resource(FollowResource, '/follows', '/follows/<int:follow_id>', '/api/users/<int:follower_id>/follow/<int:followed_id>', '/api/users/<int:follower_id>/unfollow/<int:followed_id>')
-
-
 
 
 

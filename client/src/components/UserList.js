@@ -1,23 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './style.css'; 
+import './style.css';
 
-const UserList = ({ users, followedIds, onFollow }) => {
+const UserList = ({ users, onFollow, onUnfollow }) => {
   return (
     <ul className="user-list">
       {users.map((user) => (
         <li key={user.id}>
           <div className="profile-container">
-            <img className="profile-photo" src={user.profile_photo} alt={`${user.username}'s profile`} />
+            <img
+              className="profile-photo"
+              src={user.profile_photo}
+              alt={`${user.username}'s profile`}
+            />
           </div>
-          <div className="username-container">
-            {user.username}
+          <div className="username-container">{user.username}</div>
+          <div className="action-container">
+            {user.followed ? (
+              <button onClick={() => onUnfollow(user.id)}>Unfollow</button>
+            ) : (
+              <button onClick={() => onFollow(user.id)}>Follow</button>
+            )}
           </div>
-          {followedIds.has(user.id) ? (
-            <Link to={`/users/${user.id}`}><button>View profile</button></Link>
-          ) : (
-            <button onClick={() => onFollow(user.id)}>Follow</button>
-          )}
         </li>
       ))}
     </ul>
@@ -25,5 +28,6 @@ const UserList = ({ users, followedIds, onFollow }) => {
 };
 
 export default UserList;
+
 
 

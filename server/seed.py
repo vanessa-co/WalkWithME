@@ -78,22 +78,29 @@ def seed_data():
 
 
     follows = []
+    unique_follows = set()
+
     for i in range(30):
-        follower = random.choice(users)
-        followed = random.choice(users)
-        # Ensure that follower and followed are not the same user
-        while followed == follower:
+        while True:
+            follower = random.choice(users)
             followed = random.choice(users)
+
+            # Ensure that follower and followed are not the same user
+            if followed == follower:
+                continue
+
+            # Check if the pair is unique
+            follow_pair = (follower.id, followed.id)
+            if follow_pair not in unique_follows:
+                unique_follows.add(follow_pair)
+                break
+
         follow = Follow(follower_id=follower.id, follower_username=follower.username,
-                    followed_id=followed.id, followed_username=followed.username)
+                        followed_id=followed.id, followed_username=followed.username)
         follows.append(follow)
 
     db.session.add_all(follows)
     db.session.commit()
-
-
-
-
 
 
 

@@ -1,8 +1,8 @@
-"""models changes
+"""changes to follow table
 
-Revision ID: ab0a864bef06
+Revision ID: 9d2fd29448a8
 Revises: 
-Create Date: 2023-05-02 21:48:41.799382
+Create Date: 2023-05-03 15:39:25.708858
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ab0a864bef06'
+revision = '9d2fd29448a8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,16 +25,18 @@ def upgrade():
     sa.Column('password_hash', sa.String(length=255), nullable=False),
     sa.Column('profile_photo', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
     op.create_table('follows',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('follower_id', sa.Integer(), nullable=False),
     sa.Column('followed_id', sa.Integer(), nullable=False),
+    sa.Column('follower_username', sa.String(length=80), nullable=False),
+    sa.Column('followed_username', sa.String(length=80), nullable=False),
     sa.ForeignKeyConstraint(['followed_id'], ['users.id'], name=op.f('fk_follows_followed_id_users')),
     sa.ForeignKeyConstraint(['follower_id'], ['users.id'], name=op.f('fk_follows_follower_id_users')),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('follower_id', 'followed_id', name='_follower_followed_uc')
     )
     op.create_table('walks',
     sa.Column('id', sa.Integer(), nullable=False),
