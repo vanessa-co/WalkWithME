@@ -41,8 +41,10 @@ function Walks() {
         alert('Error updating walk');
     }
 };
+ const handleDeleteWalk = async (walkId) => {
+  const shouldDelete = window.confirm('Are you sure you want to delete this walk?');
 
-  const handleDeleteWalk = async (walkId) => {
+  if (shouldDelete) {
     const response = await fetch(`/walks/${walkId}`, {
       method: 'DELETE',
     });
@@ -52,7 +54,11 @@ function Walks() {
     } else {
       alert('Error deleting walk');
     }
-  };
+  }
+};
+
+
+
 
   const successPopup = (
     <div
