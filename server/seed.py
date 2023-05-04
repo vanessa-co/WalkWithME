@@ -16,9 +16,9 @@ def seed_data():
     kim_password = bcrypt.hashpw('password2'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     kevin_password = bcrypt.hashpw('password3'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password, profile_photo='https://www.lombardvet.com/sites/default/files/styles/large/public/golden-retriever-dog-breed-info_0.jpg?itok=sYARdO3q')
-    kim = User(username='kim', email='kim@email.com', password_hash=kim_password, profile_photo='https://static.wixstatic.com/media/237a38_78996c492b2741638f2a43b3a272159c~mv2.jpg/v1/fill/w_640,h_400,al_t,q_80,usm_0.66_1.00_0.01,enc_auto/237a38_78996c492b2741638f2a43b3a272159c~mv2.jpg')
-    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password, profile_photo='https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2022-08/220805-border-collie-play-mn-1100-82d2f1.jpg')
+    vanessa = User(username='vanessa', email='vanessa@email.com', password_hash=vanessa_password, profile_photo=None)
+    kim = User(username='kim', email='kim@email.com', password_hash=kim_password, profile_photo='')
+    kevin = User(username='kevin', email='kevin@email.com', password_hash=kevin_password, profile_photo='')
 
     db.session.add_all([vanessa, kim, kevin])
     db.session.commit()
@@ -33,7 +33,7 @@ def seed_data():
         username = fake.user_name()
         email = fake.email()
         password_hash = bcrypt.hashpw(fake.password().encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        profile_photo = fake.image_url()
+        profile_photo = None
         user = User(username=username, email=email, password_hash=password_hash, profile_photo=profile_photo)
         fake_users.append(user)
 
@@ -80,7 +80,7 @@ def seed_data():
     follows = []
     unique_follows = set()
 
-    for i in range(30):
+    for i in range(100):
         while True:
             follower = random.choice(users)
             followed = random.choice(users)

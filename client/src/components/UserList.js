@@ -9,7 +9,7 @@ const UserList = ({ users, onFollow, onUnfollow }) => {
           <div className="profile-container">
             <img
               className="profile-photo"
-              src={user.profile_photo}
+              src={user.profile_photo || user.default_profile_photo || 'https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg'}
               alt={`${user.username}'s profile`}
             />
           </div>
@@ -28,6 +28,3 @@ const UserList = ({ users, onFollow, onUnfollow }) => {
 };
 
 export default UserList;
-
-
-

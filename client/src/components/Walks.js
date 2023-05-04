@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import WalkForm from './WalkForm';
@@ -8,6 +7,7 @@ import UserFollowers from './UserFollowers';
 function Walks() {
   const [walks, setWalks] = useState([]);
   const { user } = useContext(AuthContext);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   useEffect(() => {
     const fetchWalks = async () => {
@@ -21,6 +21,8 @@ function Walks() {
 
   const addWalk = (walk) => {
     setWalks((prevWalks) => [...prevWalks, walk]);
+    setShowSuccessPopup(true);
+    setTimeout(() => setShowSuccessPopup(false), 3000);
   };
 
   const handleEditWalk = async (updatedWalk) => {
@@ -31,7 +33,7 @@ function Walks() {
       },
       body: JSON.stringify(updatedWalk),
     });
-  
+
     if (response.ok) {
       const walk = await response.json();
       setWalks((prevWalks) => prevWalks.map((w) => (w.id === walk.id ? walk : w)));
@@ -39,7 +41,6 @@ function Walks() {
       alert('Error updating walk');
     }
   };
-  
 
   const handleDeleteWalk = async (walkId) => {
     const response = await fetch(`/walks/${walkId}`, {
@@ -53,12 +54,31 @@ function Walks() {
     }
   };
 
+  const successPopup = (
+    <div
+      style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '5px',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+        zIndex: 999,
+      }}
+    >
+      <p>Thanks for posting!</p>
+    </div>
+  );
+
   return (
     <div>
-      <h2>...</h2>
+      <h2>Walks</h2>
       {user && <p>Welcome, {user.username}!</p>}
       {user && <UserFollowers userId={user.id} />}
       {user && <WalkForm onAddWalk={addWalk} />}
+      {showSuccessPopup && successPopup}
       <ul>
         {walks.map((walk) => (
           <WalkItem
@@ -75,5 +95,3 @@ function Walks() {
 }
 
 export default Walks;
-
-

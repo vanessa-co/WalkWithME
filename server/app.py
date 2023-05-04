@@ -239,7 +239,7 @@ class ReviewByIdResource(Resource):
             review.rating = updated_data['rating']
         if 'comment' in updated_data:
             review.comment = updated_data['comment']
-        if 'text' in updated_data:  # Add this block to update the text field
+        if 'text' in updated_data: 
             review.text = updated_data['text']
         db.session.commit()
         return review.to_dict()

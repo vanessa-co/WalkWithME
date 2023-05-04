@@ -39,10 +39,15 @@ class User(db.Model, SerializerMixin):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
     
+    # def get_profile_photo_url(self):
+    #     if self.profile_photo:
+    #         return f'/users/{self.id}/profile_photo'
+    #     return None
+    
     def get_profile_photo_url(self):
         if self.profile_photo:
-            return f'/users/{self.id}/profile_photo'
-        return None
+            return f'https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg/{self.id}/profile_photo'
+
     
     def to_dict(self, include_followers=False):
         user_data = {
