@@ -19,7 +19,7 @@ const Auth = () => {
     setError('');
 
     try {
-      const response = await fetch('http://127.0.0.1:5555/auth', {
+      const response = await fetch('/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

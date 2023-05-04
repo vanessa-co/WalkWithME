@@ -15,9 +15,7 @@ EXPIRATION_TIME = 60 * 60 * 24
 
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 
-# Configure the upload folder and allowed file extensions (not in use)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -27,13 +25,6 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(user_id)
 
-@app.after_request
-def add_header(response):
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    return response
 
 
 def generate_token(user_id):
@@ -44,10 +35,6 @@ def generate_token(user_id):
     return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -57,13 +44,6 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(user_id)
 
-@app.after_request
-def add_header(response):
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    return response
 
 
 class Home(Resource):
@@ -353,11 +333,9 @@ def auth():
 
         token = generate_token(user.id)
 
-        # user_followers = [follow.follower.to_dict() for follow in user.followers]
-        # Get the followers for the user
+      
         user_followers = [follow.follower.to_dict() for follow in user.followers_assoc]
-        # Get the users that the user is following
-        # user_following = [follow.followed.to_dict() for follow in user.followed_assoc]
+       
 
         user_data = user.to_dict()
         user_data['followers'] = user_followers
@@ -398,55 +376,6 @@ def logout():
     return {"message": "Logged out successfully"}, 200
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-
-    if not username or not password:
-        return {"error": "Username and password are required"}, 400
-
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.check_password(password):
-        return {"error": "Invalid credentials"}, 401
-
-    login_user(user)
-    return {"message": "Logged in successfully", "user": user.to_dict()}, 200
-
-@app.route('/signup', methods=['POST'])
-def signup():
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
-
-    if not username or not email or not password:
-        return {"error": "All fields are required"}, 400
-
-    user = User.query.filter_by(username=username).first()
-    if user:
-        return {"error": "Username already exists"}, 409
-
-    user = User.query.filter_by(email=email).first()
-    if user:
-        return {"error": "Email already exists"}, 409
-
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    user = User(username=username, email=email, password_hash=hashed_password)
-    db.session.add(user)
-    db.session.commit()
-
-    return {"message": "User created successfully", "user": user.to_dict()}, 201
-
-
-@app.route('/logout', methods=['POST'])
-@login_required
-def logout_user_route():
-    logout_user()
-    return {"message": "Logged out successfully"}, 200
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
