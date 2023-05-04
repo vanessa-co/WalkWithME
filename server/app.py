@@ -135,21 +135,25 @@ class WalkResource(Resource):
         return walk.to_dict(), 201
 
     def patch(self, walk_id):
-     walk = Walk.query.get(walk_id)
-     if not walk:
+        walk = Walk.query.get(walk_id)
+        if not walk:
          return {"error": "Walk not found"}, 404
 
-     data = request.json
+        data = request.json
 
-     walk.name = data.get('name', walk.name)
-     walk.location = data.get('location', walk.location)
-     walk.distance = data.get('distance', walk.distance)
-     walk.photo = data.get('photo', walk.photo)
-    #  walk.description = data.get('description', walk.description)
+        walk.name = data.get('name', walk.name)
+        walk.location = data.get('location', walk.location)
+        walk.distance = data.get('distance', walk.distance)
+        walk.photo = data.get('photo', walk.photo)
+    # walk.description = data.get('description', walk.description)
 
-     db.session.commit()
+        db.session.commit()
 
-     return {"message": "Walk updated successfully"}, 200
+        return walk.to_dict(), 200  # Return the updated walk data
+
+
+
+
 
 
 

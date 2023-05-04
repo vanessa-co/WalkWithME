@@ -27,20 +27,20 @@ function Walks() {
 
   const handleEditWalk = async (updatedWalk) => {
     const response = await fetch(`/walks/${updatedWalk.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedWalk),
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedWalk),
     });
 
     if (response.ok) {
-      const walk = await response.json();
-      setWalks((prevWalks) => prevWalks.map((w) => (w.id === walk.id ? walk : w)));
+        const walk = await response.json();
+        setWalks((prevWalks) => prevWalks.map((w) => (w.id === walk.id ? walk : w)));
     } else {
-      alert('Error updating walk');
+        alert('Error updating walk');
     }
-  };
+};
 
   const handleDeleteWalk = async (walkId) => {
     const response = await fetch(`/walks/${walkId}`, {
