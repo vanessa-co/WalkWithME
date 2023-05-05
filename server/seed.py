@@ -43,8 +43,8 @@ def seed_data():
     users = User.query.all()
 
     # Walks for Vanessa
-    vanessa_walk1 = Walk(name="Central Park Walk", location='Central Park', distance=2.5, photo='https://i.natgeofe.com/n/15ec8dec-df7c-45af-a0ae-08d4e906a134/belvedere-castle.jpg?w=2880&h=2160', user_id=vanessa.id)
-    vanessa_walk2 = Walk(name="Hudson River Park Walk", location='Hudson River Park', distance=3.2, photo='https://www.frommers.com/system/media_items/attachments/000/868/444/s980/Frommers-New-York-City-jogging-hudson-park-1190x768.jpg?1646914426', user_id=vanessa.id)
+    vanessa_walk1 = Walk(name="Wine Walk", location='Central Park', distance=2.5, photo='https://i.natgeofe.com/n/15ec8dec-df7c-45af-a0ae-08d4e906a134/belvedere-castle.jpg?w=2880&h=2160', user_id=vanessa.id)
+    vanessa_walk2 = Walk(name="Mud Run", location='Hudson River Park', distance=3.2, photo='https://www.frommers.com/system/media_items/attachments/000/868/444/s980/Frommers-New-York-City-jogging-hudson-park-1190x768.jpg?1646914426', user_id=vanessa.id)
 
     # Walks for Kim
     kim_walk1 = Walk(name="High Line Walk", location='High Line', distance=1.5, photo='https://assets.gocity.com/files/ufrfmb171/files/featured_images/shutterstock_247505947.jpg', user_id=kim.id)
@@ -57,17 +57,20 @@ def seed_data():
     db.session.add_all([vanessa_walk1, vanessa_walk2, kim_walk1, kim_walk2, kevin_walk1, kevin_walk2])
     db.session.commit()
 
+
     # Reviews for Vanessa's walks
-    vanessa_review1 = Review(id=1, text='I had the most Magical experience walking through Central Park!', user_id=vanessa.id, walk_id=vanessa_walk1.id, rating=5)
-    vanessa_review2 = Review(id=2, text='Great place to people watch. There is also a running trail for all the runners out there!', user_id=vanessa.id, walk_id=vanessa_walk2.id, rating=4)
+    vanessa_review1 = Review(id=1, text='We had such a blast on our winee walk, a great time for groups of friends or couples!', user_id=vanessa.id, walk_id=vanessa_walk1.id, rating=5, event_name='Wine Walk', location='Central Park, NY', date='2023-05-01', time='15:00', category='leisure')
+    vanessa_review2 = Review(id=2, text='Sign up for a mud run as soon as you can!', user_id=vanessa.id, walk_id=vanessa_walk2.id, rating=4, event_name='Mud Run', location='Hudson River Park, NY', date='2023-05-02', time='14:00', category='athletic')
 
-    # Reviews for Kim's walks
-    kim_review1 = Review(id=3, text='The High Line is a unique park with beautiful views of the city!', user_id=kim.id, walk_id=kim_walk1.id, rating=5)
-    kim_review2 = Review(id=4, text='Brooklyn Bridge Park has a great atmosphere and stunning views!', user_id=kim.id, walk_id=kim_walk2.id, rating=4)
+# Reviews for Kim's walks
+    kim_review1 = Review(id=3, text='This nature walk was exactky what i needed!', user_id=kim.id, walk_id=kim_walk1.id, rating=5, event_name='Brooklyn Botanical Gardens', location='Brooklyn, NY', date='2023-05-03', time='11:00', category='leisure')
+    kim_review2 = Review(id=4, text='the Tunnle run is for such a good cause. we look forward to it every year!', user_id=kim.id, walk_id=kim_walk2.id, rating=4, event_name='Tunnel Run', location='West Newyork, NJ', date='2023-05-04', time='16:00', category='Charity')
 
-    # Reviews for Kevin's walks
-    kevin_review1 = Review(id=5, text='Battery Park has amazing views of the Statue of Liberty!', user_id=kevin.id, walk_id=kevin_walk1.id, rating=4)
-    kevin_review2 = Review(id=6, text='Prospect Park is the perfect place to escape the hustle and bustle of the city!', user_id=kevin.id, walk_id=kevin_walk2.id, rating=5)
+# Reviews for Kevin's walks
+    kevin_review1 = Review(id=5, text='The zombie walk was a killer good time', user_id=kevin.id, walk_id=kevin_walk1.id, rating=4, event_name='Zombie Walk', location='Battery Park, NY', date='2023-05-05', time='09:00', category='leisure')
+    kevin_review2 = Review(id=6, text='the Iron man Run was the a thrill!', user_id=kevin.id, walk_id=kevin_walk2.id, rating=5, event_name='Iron Man', location='Prospect Park, NY', date='2023-05-06', time='9:00', category='Athletic')
+
+
 
 
     db.session.add_all([vanessa_review1, vanessa_review2, kim_review1, kim_review2, kevin_review1, kevin_review2])

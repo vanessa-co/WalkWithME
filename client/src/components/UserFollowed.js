@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import UserList from './UserList';
 import { Col, Container, Row } from 'react-bootstrap';
 
-const UserFollowers = ({ userId }) => {
-  const [followers, setFollowers] = useState([]);
+const UserFollowed = ({ userId }) => {
+  const [followed, setFollowed] = useState([]);
 
   useEffect(() => {
-    const fetchFollowers = async () => {
-      const response = await fetch(`/api/users/${userId}/followers`);
+    const fetchFollowed = async () => {
+      const response = await fetch(`/api/users/${userId}/followed`);
       const data = await response.json();
-      setFollowers(data);
+      setFollowed(data);
     };
-  
-    fetchFollowers();
+
+    fetchFollowed();
   }, [userId]);
 
   return (
@@ -22,7 +22,7 @@ const UserFollowers = ({ userId }) => {
           <div className="user-container">
             <h2>Following:</h2>
             <div className="user-scroll">
-              <UserList users={followers} />
+              <UserList users={followed} />
             </div>
           </div>
         </Col>
@@ -31,5 +31,5 @@ const UserFollowers = ({ userId }) => {
   );
 };
 
-export default UserFollowers;
+export default UserFollowed;
 

@@ -53,3 +53,138 @@
   }
   
 
+
+  /* home page */
+
+/* styles for the photo carousel */
+.photo-carousel {
+  height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-carousel img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.photo-carousel img.active {
+  opacity: 1;
+}
+
+.photo-carousel .arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.photo-carousel .left-arrow {
+  left: 20px;
+  background-image: url('');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.photo-carousel .right-arrow {
+  right: 20px;
+  background-image: url('');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+
+
+/* styles for the Header component */
+.navbar-brand {
+  font-size: 2rem;
+  color: #040404;
+}
+
+.border-primary {
+  border-color: #fd0d85 !important;
+}
+
+/* styles for the Footer component */
+footer {
+  background-color: #f8f9fa;
+  font-size: 0.9rem;
+}
+
+h4 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+.text-primary {
+  color: #0d6efd !important;
+}
+
+.list-unstyled li {
+  margin-bottom: 0.5rem;
+}
+
+hr {
+  margin-top: 2rem;
+  margin-bottom: 1rem
+}
+
+
+/* styles for the Eco-Friendly section in Footer component */
+ul.list-unstyled li {
+  margin-bottom: 0.20rem;
+}
+
+ul.list-unstyled li svg {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+li.recycle {
+  display: flex;
+  align-items: center;
+}
+
+img.recycle-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+
+/* user follower/ followed */
+
+.follow-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.follower-list,
+.followed-list {
+  height: 100px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  width: 45%;
+}
+
+.follower-list {
+  background-color: #f9f9f9;
+}
+
+.followed-list {
+  background-color: #fff;
+}

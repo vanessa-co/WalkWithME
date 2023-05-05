@@ -1,8 +1,8 @@
-"""new models. reviews model added
+"""taable update
 
-Revision ID: 663af93839d6
+Revision ID: 784a2aec8bf4
 Revises: 
-Create Date: 2023-05-04 04:29:39.531639
+Create Date: 2023-05-05 01:21:32.078412
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '663af93839d6'
+revision = '784a2aec8bf4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,16 +52,15 @@ def upgrade():
     op.create_table('reviews',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('text', sa.String(), nullable=False),
-    sa.Column('comment', sa.String(length=255), nullable=True),
-    sa.Column('event', sa.String(length=120), nullable=False),
-    sa.Column('location', sa.String(length=120), nullable=False),
-    sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('time', sa.Time(), nullable=False),
-    sa.Column('interested', sa.Boolean(), nullable=True),
-    sa.Column('attending', sa.Boolean(), nullable=True),
-    sa.Column('category', sa.Enum('leisure', 'competitive', 'athletic', 'charity'), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('walk_id', sa.Integer(), nullable=False),
+    sa.Column('rating', sa.Float(), nullable=False),
+    sa.Column('comment', sa.String(length=255), nullable=True),
+    sa.Column('event_name', sa.String(length=200), nullable=False),
+    sa.Column('location', sa.String(length=200), nullable=False),
+    sa.Column('date', sa.String(length=10), nullable=False),
+    sa.Column('time', sa.String(length=5), nullable=False),
+    sa.Column('category', sa.String(length=15), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_reviews_user_id_users')),
     sa.ForeignKeyConstraint(['walk_id'], ['walks.id'], name=op.f('fk_reviews_walk_id_walks')),
     sa.PrimaryKeyConstraint('id')

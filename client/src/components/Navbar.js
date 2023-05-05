@@ -21,11 +21,11 @@ function Navbar() {
 
     if (response.ok) {
       setUser(null);
-      localStorage.removeItem('user'); // Remove user from local storage
+      localStorage.removeItem('user'); 
       navigate('/');
-      toast(<CustomToast message="You have successfully logged out!" imageSrc="/path/to/your/image.png" />);
+      toast(<CustomToast message="You have successfully logged out!" imageSrc="" />);
     } else {
-      // Handle logout error
+   
     }
   };
 
@@ -39,7 +39,7 @@ function Navbar() {
         <Nav className="me-auto">
           {user && <Nav.Link as={Link} to="/walks">Walks</Nav.Link>}
           {user && <Nav.Link as={Link} to="/reviews">Reviews</Nav.Link>}
-          {user && <Nav.Link as={Link} to={`/profile/${user._id}`}>Profile</Nav.Link>}
+          {user && <Nav.Link as={Link} to="/AboutUs">About us</Nav.Link>}
         </Nav>
         <Nav className="ms-auto">
           {user ? (

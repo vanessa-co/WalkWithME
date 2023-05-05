@@ -242,6 +242,15 @@ class ReviewByIdResource(Resource):
 
 api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
 
+class FollowedResource(Resource):
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+        followed = [follow.followed.to_dict() for follow in user.followers_assoc]
+        return followed
+
+api.add_resource(FollowedResource, '/api/users/<int:user_id>/followed')
 
 
 
@@ -256,61 +265,47 @@ class FollowerResource(Resource):
 api.add_resource(FollowerResource, '/api/users/<int:user_id>/followers')
 
 
-
 class FollowResource(Resource):
-    def get(self, follow_id=None):
-        if follow_id:
-            follow = Follow.query.get(follow_id)
-            return follow.to_dict() if follow else {"error": "Follow not found"}, 404
-        follows = Follow.query.all()
-        return [follow.to_dict() for follow in follows]
+    def post(self, user_id, followed_id):
+        user = User.query.get(user_id)
+        followed_user = User.query.get(followed_id)
 
-    class FollowResource(Resource):
+        if not user or not followed_user:
+            return {"error": "User not found"}, 404
 
-     def post(self):
-        follower_id = request.json.get('follower_id')
-        followed_id = request.json.get('followed_id')
+        follow = Follow.query.filter_by(follower_id=user_id, followed_id=followed_id).first()
 
-        if not follower_id or not followed_id:
-            return {"error": "Follower_id and followed_id are required fields"}, 400
+        if follow:
+            return {"error": "Already following"}, 400
 
-        existing_follow = Follow.query.filter_by(follower_id=follower_id, followed_id=followed_id).first()
-        if existing_follow:
-            return {"error": "User is already followed"}, 400
+        new_follow = Follow(
+            follower_id=user_id,
+            followed_id=followed_id,
+            follower_username=user.username,
+            followed_username=followed_user.username,
+        )
 
-        follower = User.query.get(follower_id)
-        followed = User.query.get(followed_id)
-
-        if not follower or not followed:
-            return {"error": "Follower or followed user not found"}, 404
-
-        follow = Follow(follower_id=follower_id, followed_id=followed_id, 
-                        follower_username=follower.username, followed_username=followed.username)
-        db.session.add(follow)
+        db.session.add(new_follow)
         db.session.commit()
 
-        return {"message": "Follow created successfully"}, 201
+        return new_follow.to_dict(), 201
+    
+api.add_resource(FollowResource, '/api/users/<int:user_id>/follow/<int:followed_id>')
 
 
+class UnfollowResource(Resource):
+    def delete(self, user_id, followed_id):
+        follow = Follow.query.filter_by(follower_id=user_id, followed_id=followed_id).first()
 
-    def follow(self, follower_id, followed_id):
-        existing_follow = Follow.query.filter_by(follower_id=follower_id, followed_id=followed_id).first()
-        if not existing_follow:
-            follow = Follow(follower_id=follower_id, followed_id=followed_id)
-            db.session.add(follow)
-            db.session.commit()
-            return {"message": "User followed successfully"}, 201
-        return {"error": "User is already followed"}, 400
+        if not follow:
+            return {"error": "Not following"}, 404
 
-    def unfollow(self, follower_id, followed_id):
-        follow = Follow.query.filter_by(follower_id=follower_id, followed_id=followed_id).first()
-        if follow:
-            db.session.delete(follow)
-            db.session.commit()
-            return {"message": "User unfollowed successfully"}, 200
-        return {"error": "User is not followed"}, 404
+        db.session.delete(follow)
+        db.session.commit()
 
-api.add_resource(FollowResource, '/follows', '/follows/<int:follow_id>', '/api/users/<int:follower_id>/follow/<int:followed_id>', '/api/users/<int:follower_id>/unfollow/<int:followed_id>')
+        return {"message": "Unfollowed"}, 200
+
+api.add_resource(UnfollowResource, '/api/users/<int:user_id>/unfollow/<int:followed_id>')
 
 
 

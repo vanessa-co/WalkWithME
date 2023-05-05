@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
+import ReviewForm from './ReviewForm';
+
 
 import {
   Box,
@@ -216,7 +218,11 @@ function Reviews() {
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
-        Reviews
+      Community Reviews and Events 
+     </Typography>
+    <ReviewForm onSubmit={addReview} />
+      <Typography variant="h4" gutterBottom>
+        ...
       </Typography>
       <Form onSubmit={handleSubmit}>
         <TextFieldStyled

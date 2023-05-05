@@ -1,9 +1,9 @@
 import React from 'react';
 
-function Profile() {
+function AboutUs() {
   return <div>coming soon...</div>;
 }
 
-export default Profile;
+export default AboutUs;
 
 

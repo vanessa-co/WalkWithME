@@ -3,6 +3,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import WalkForm from './WalkForm';
 import WalkItem from './WalkItem';
 import UserFollowers from './UserFollowers';
+import UserFollowed from './UserFollowed';
 
 function Walks() {
   const [walks, setWalks] = useState([]);
@@ -83,6 +84,7 @@ function Walks() {
       <h2>Walks</h2>
       {user && <p>Welcome, {user.username}!</p>}
       {user && <UserFollowers userId={user.id} />}
+      {user && <UserFollowed userId={user.id} />}
       {user && <WalkForm onAddWalk={addWalk} />}
       {showSuccessPopup && successPopup}
       <ul>

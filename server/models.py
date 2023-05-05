@@ -17,18 +17,16 @@ class User(db.Model, SerializerMixin):
     followed = association_proxy('followed_assoc', 'followed')
     followers = association_proxy('followers_assoc', 'follower')
 
-
     def __init__(self, username, email, password=None, password_hash=None, profile_photo=None):
-     self.username = username
-     self.email = email
-     if password:
-        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-     elif password_hash:
-        self.password_hash = password_hash
-     else:
-        raise ValueError("Either 'password' or 'password_hash' argument must be provided")
-     self.profile_photo = profile_photo
-
+        self.username = username
+        self.email = email
+        if password:
+            self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        elif password_hash:
+            self.password_hash = password_hash
+        else:
+            raise ValueError("Either 'password' or 'password_hash' argument must be provided")
+        self.profile_photo = profile_photo
 
     @validates('password')
     def validate_password(self, key, password):
@@ -38,17 +36,11 @@ class User(db.Model, SerializerMixin):
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
-    
-    # def get_profile_photo_url(self):
-    #     if self.profile_photo:
-    #         return f'/users/{self.id}/profile_photo'
-    #     return None
-    
+
     def get_profile_photo_url(self):
         if self.profile_photo:
             return f'https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg/{self.id}/profile_photo'
 
-    
     def to_dict(self, include_followers=False):
         user_data = {
             "id": self.id,
@@ -60,13 +52,25 @@ class User(db.Model, SerializerMixin):
             user_data["followers"] = [follower.to_dict() for follower in self.followers]
         return user_data
 
-
     def get_followers(self):
         return [follower.to_dict() for follower in self.followers]
-    
+
     def get_followed(self):
         return [followed.to_dict() for followed in self.followed]
 
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return user in self.followed
+
+    def is_followed_by(self, user):
+        return user in self.followers
 
 
 class Walk(db.Model, SerializerMixin):
@@ -93,13 +97,18 @@ class Walk(db.Model, SerializerMixin):
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
-    id = db.Column(db.String(36), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     walk_id = db.Column(db.Integer, db.ForeignKey('walks.id'), nullable=False)
     rating = db.Column(db.Float, nullable=False)
     comment = db.Column(db.String(255), nullable=True)
     user = db.relationship('User', back_populates='reviews')
+    event_name = db.Column(db.String(200), nullable=False)
+    location = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.String(10), nullable=False)  
+    time = db.Column(db.String(5), nullable=False) 
+    category = db.Column(db.String(15), nullable=False)
 
     def to_dict(self):
         return {
@@ -109,12 +118,14 @@ class Review(db.Model, SerializerMixin):
             "walk_id": self.walk_id,
             "rating": self.rating,
             "comment": self.comment,
-
+            "event_name": self.event_name,
+            "location": self.location,
+            "date": self.date,  
+            "time": self.time,  
+            "category": self.category,
         }
 
-
-
-class Follow(db.Model):
+class Follow(db.Model, SerializerMixin):
     __tablename__ = 'follows'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -139,5 +150,3 @@ class Follow(db.Model):
             "followed_id": self.followed_id,
             "followed_username": self.followed_username,
         }
-
-

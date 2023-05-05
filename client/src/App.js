@@ -5,8 +5,11 @@ import Home from './components/Home';
 import Walks from './components/Walks';
 import Reviews from './components/Reviews';
 import Auth from './components/Auth';
-import Profile from './components/Profile';
+import AboutUs from './components/AboutUs';
 import UserFollowers from './components/UserFollowers';
+import UserFollowed from './components/UserFollowed';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import { AuthContext, AuthContextProvider } from './contexts/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import { ReviewsContextProvider } from "./contexts/ReviewsContext";
@@ -19,7 +22,9 @@ function App() {
       <ReviewsContextProvider>
           <Router>
             <Navbar />
+            <Header/>
             <MainRoutes />
+            <Footer/>
           </Router>
           <ToastContainer />
       </ReviewsContextProvider>
@@ -36,8 +41,9 @@ function MainRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/walks" element={<Walks />} />
       <Route path="/reviews" element={<Reviews />} />
-      <Route path="/profile/:userId" element={<Profile />} />
+      <Route path="/AboutUs" element={<AboutUs />} />
       <Route path="/followers" element={<UserFollowers />} />
+      <Route path="/followed" element={<UserFollowed />} />
       {!user && <Route path="/auth" element={<Auth />} />}
     </Routes>
   );
