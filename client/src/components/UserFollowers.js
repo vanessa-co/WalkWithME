@@ -53,9 +53,31 @@ export default UserFollowers;
 
 
 // import React from 'react';
+// import UserList from './UserList';
+// import { Col, Container, Row } from 'react-bootstrap';
 
-// function UserFollowers() {
-//   return <div>coming soon...</div>;
-// }
+// const UserFollowers = ({ userId, followers, following }) => {
+//   return (
+//     <Container fluid>
+//       <Row>
+//         <Col md={{ span: 4, offset: 4 }}>
+//           <div className="user-container">
+//             <h2>Followers:</h2>
+//             <div className="user-scroll">
+//               <UserList users={followers} followerList={true} />
+//             </div>
+//           </div>
+//           <div className="user-container">
+//             <h2>Following:</h2>
+//             <div className="user-scroll">
+//               <UserList users={following} followerList={true} />
+//             </div>
+//           </div>
+//         </Col>
+//       </Row>
+//     </Container>
+//   );
+// };
 
 // export default UserFollowers;
+

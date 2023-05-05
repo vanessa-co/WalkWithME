@@ -310,6 +310,38 @@ api.add_resource(FollowResource, '/api/users/<int:user_id>/follow/<int:followed_
 
 
 
+class SignUpFollowResource(Resource):
+    def post(self, user_id, followed_id):
+        user = User.query.get(user_id)
+        followed_user = User.query.get(followed_id)
+
+        if not user or not followed_user:
+            return {"error": "User not found"}, 404
+
+        follow = Follow.query.filter_by(follower_id=user_id, followed_id=followed_id).first()
+
+        if follow:
+            return {"error": "Already following"}, 400
+
+        new_follow = Follow(
+            follower_id=user_id,
+            followed_id=followed_id,
+            follower_username=user.username,
+            followed_username=followed_user.username,
+        )
+
+        db.session.add(new_follow)
+        db.session.commit()
+
+        return new_follow.to_dict(), 201
+
+api.add_resource(SignUpFollowResource, '/api/users/<int:user_id>/signup_follow/<int:followed_id>')
+
+
+
+
+
+
 
 class UnfollowResource(Resource):
     def delete(self, user_id, followed_id):

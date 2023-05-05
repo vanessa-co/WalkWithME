@@ -1,8 +1,7 @@
-
 import React from 'react';
 import './style.css';
 
-const UserList = ({ users, onFollow, onUnfollow, title, followerList }) => {
+const UserList = ({ users, onFollow, onUnfollow, title, followerList, isNewUser }) => {
   return (
     <div className="user-list-container">
       <h3>{title}</h3>
@@ -27,7 +26,7 @@ const UserList = ({ users, onFollow, onUnfollow, title, followerList }) => {
               {user.followed ? (
                 <button onClick={() => onUnfollow(user.id)}>Unfollow</button>
               ) : (
-                <button onClick={() => onFollow(user.id)}>Follow</button>
+                <button onClick={() => onFollow(user.id, isNewUser)}>Follow</button>
               )}
             </div>
           </li>
