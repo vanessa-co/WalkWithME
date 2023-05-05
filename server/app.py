@@ -90,8 +90,20 @@ class UserResource(Resource):
             return {"message": "User deleted successfully"}
         return {"error": "User not found"}, 404
 
-
 api.add_resource(UserResource, '/users', '/users/<int:user_id>')
+
+
+
+class AllUsersResource(Resource):
+    def get(self):
+        users = User.query.all()
+        return [user.to_dict() for user in users]
+
+api.add_resource(AllUsersResource, '/api/users')
+
+
+
+
 
 class WalkResource(Resource):
     def get(self, walk_id=None):
@@ -242,16 +254,18 @@ class ReviewByIdResource(Resource):
 
 api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
 
+
+
+
 class FollowedResource(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
-        followed = [follow.followed.to_dict() for follow in user.followers_assoc]
+        followed = [{"id": f.followed.id, "username": f.followed.username, "profile_photo": f.followed.get_profile_photo_url(), "follower_username": f.follower.username} for f in user.followed_assoc]
         return followed
 
 api.add_resource(FollowedResource, '/api/users/<int:user_id>/followed')
-
 
 
 class FollowerResource(Resource):
@@ -259,7 +273,7 @@ class FollowerResource(Resource):
         user = User.query.get(user_id)
         if not user:
             return {"error": "User not found"}, 404
-        followers = [follow.follower.to_dict() for follow in user.followed_assoc]
+        followers = [{"id": f.follower.id, "username": f.follower.username, "profile_photo": f.follower.get_profile_photo_url(), "followed_username": f.followed.username} for f in user.followers_assoc]
         return followers
 
 api.add_resource(FollowerResource, '/api/users/<int:user_id>/followers')
@@ -289,8 +303,12 @@ class FollowResource(Resource):
         db.session.commit()
 
         return new_follow.to_dict(), 201
-    
+
 api.add_resource(FollowResource, '/api/users/<int:user_id>/follow/<int:followed_id>')
+
+
+
+
 
 
 class UnfollowResource(Resource):
@@ -306,6 +324,9 @@ class UnfollowResource(Resource):
         return {"message": "Unfollowed"}, 200
 
 api.add_resource(UnfollowResource, '/api/users/<int:user_id>/unfollow/<int:followed_id>')
+
+
+
 
 
 
@@ -328,12 +349,13 @@ def auth():
 
         token = generate_token(user.id)
 
-      
         user_followers = [follow.follower.to_dict() for follow in user.followers_assoc]
-       
+        user_followed = [follow.followed.to_dict() for follow in user.followed_assoc]
 
         user_data = user.to_dict()
         user_data['followers'] = user_followers
+        user_data['followed'] = user_followed
+
         return {"message": "Logged in successfully", "user": user_data, "token": token}, 200
     elif action == 'signup':
         if not email:
@@ -354,13 +376,21 @@ def auth():
 
         token = generate_token(user.id)
 
-        user_followers = [follow.follower.to_dict() for follow in user.followers]
+        user_followers = [follow.follower.to_dict() for follow in user.followers_assoc]
+        user_followed = [follow.followed.to_dict() for follow in user.followed_assoc]
+
         user_data = user.to_dict()
         user_data['followers'] = user_followers
+        user_data['followed'] = user_followed
 
         return {"message": "User created successfully", "user": user_data, "token": token}, 201
     else:
         return {"error": "Invalid action"}, 400
+
+
+
+
+
 
 
 

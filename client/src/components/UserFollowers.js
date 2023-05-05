@@ -4,6 +4,7 @@ import { Col, Container, Row } from 'react-bootstrap';
 
 const UserFollowers = ({ userId }) => {
   const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
 
   useEffect(() => {
     const fetchFollowers = async () => {
@@ -15,14 +16,30 @@ const UserFollowers = ({ userId }) => {
     fetchFollowers();
   }, [userId]);
 
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      const response = await fetch(`/api/users/${userId}/followed`);
+      const data = await response.json();
+      setFollowing(data);
+    };
+  
+    fetchFollowing();
+  }, [userId]);
+
   return (
     <Container fluid>
       <Row>
-        <Col md={{ span: 4, offset: 5 }}>
+        <Col md={{ span: 4, offset: 4 }}>
+          <div className="user-container">
+            <h2>Followers:</h2>
+            <div className="user-scroll">
+              <UserList users={followers} followerList={true} />
+            </div>
+          </div>
           <div className="user-container">
             <h2>Following:</h2>
             <div className="user-scroll">
-              <UserList users={followers} />
+              <UserList users={following} followerList={true} />
             </div>
           </div>
         </Col>
@@ -33,3 +50,12 @@ const UserFollowers = ({ userId }) => {
 
 export default UserFollowers;
 
+
+
+// import React from 'react';
+
+// function UserFollowers() {
+//   return <div>coming soon...</div>;
+// }
+
+// export default UserFollowers;

@@ -4,6 +4,7 @@ import WalkForm from './WalkForm';
 import WalkItem from './WalkItem';
 import UserFollowers from './UserFollowers';
 import UserFollowed from './UserFollowed';
+import UserAddFollow from './UserAddFollow';
 
 function Walks() {
   const [walks, setWalks] = useState([]);
@@ -85,6 +86,7 @@ function Walks() {
       {user && <p>Welcome, {user.username}!</p>}
       {user && <UserFollowers userId={user.id} />}
       {user && <UserFollowed userId={user.id} />}
+      {user && <UserAddFollow userId={user.id} />}
       {user && <WalkForm onAddWalk={addWalk} />}
       {showSuccessPopup && successPopup}
       <ul>

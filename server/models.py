@@ -143,10 +143,10 @@ class Follow(db.Model, SerializerMixin):
         return f'<Follow {self.follower_username} is following {self.followed_username}>'
 
     def to_dict(self):
-        return {
-            "id": self.id,
-            "follower_id": self.follower_id,
-            "follower_username": self.follower_username,
-            "followed_id": self.followed_id,
-            "followed_username": self.followed_username,
-        }
+     return {
+        "id": self.id,
+        "follower_id": self.follower_id,
+        "follower_username": self.follower.username,
+        "followed_id": self.followed_id,
+        "followed_username": self.followed.username,
+    }

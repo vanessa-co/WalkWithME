@@ -1,25 +1,28 @@
+
 import React from 'react';
 import './style.css';
 
-const UserList = ({ users, onFollow, onUnfollow, title }) => {
+const UserList = ({ users, onFollow, onUnfollow, title, followerList }) => {
   return (
     <div className="user-list-container">
       <h3>{title}</h3>
       <ul className="user-list">
-        {users.map((user) => (
+        {users?.map((user) => (
           <li key={user.id}>
             <div className="profile-container">
               <img
                 className="profile-photo"
                 src={
-                  user.profile_photo ||
-                  user.default_profile_photo ||
+                  user.follower?.profile_photo ||
+                  user.follower?.default_profile_photo ||
                   'https://static.vecteezy.com/system/resources/previews/002/318/271/original/user-profile-icon-free-vector.jpg'
                 }
-                alt={`${user.username}'s profile`}
+                alt={`${user.follower?.username || user.followed?.username}'s profile`}
               />
             </div>
-            <div className="username-container">{user.username}</div>
+            <div className="username-container">
+              {followerList ? user.follower_username || user.followed_username : user.username}
+            </div>
             <div className="action-container">
               {user.followed ? (
                 <button onClick={() => onUnfollow(user.id)}>Unfollow</button>
@@ -35,3 +38,9 @@ const UserList = ({ users, onFollow, onUnfollow, title }) => {
 };
 
 export default UserList;
+
+
+
+
+
+

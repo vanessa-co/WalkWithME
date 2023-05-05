@@ -8,6 +8,7 @@ import Auth from './components/Auth';
 import AboutUs from './components/AboutUs';
 import UserFollowers from './components/UserFollowers';
 import UserFollowed from './components/UserFollowed';
+import UserAddFollow from './components/UserAddFollow';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext, AuthContextProvider } from './contexts/AuthContext';
@@ -44,6 +45,7 @@ function MainRoutes() {
       <Route path="/AboutUs" element={<AboutUs />} />
       <Route path="/followers" element={<UserFollowers />} />
       <Route path="/followed" element={<UserFollowed />} />
+      <Route path="/addFollow" element={<UserAddFollow />} />
       {!user && <Route path="/auth" element={<Auth />} />}
     </Routes>
   );
