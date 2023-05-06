@@ -197,62 +197,53 @@ class UserProfilePhotoResource(Resource):
 api.add_resource(UserProfilePhotoResource, '/users/<int:user_id>/profile_photo')
 
 
-class ReviewResource(Resource):
-    def get(self, review_id=None):
-        if review_id:
-            review = Review.query.get(review_id)
-            return review.to_dict() if review else {"error": "Review not found"}, 404
+class ReviewsResource(Resource):
+    def get(self):
         reviews = Review.query.all()
         return [review.to_dict() for review in reviews]
 
     def post(self):
-        walk_id = request.json.get('walk_id')
-        user_id = request.json.get('user_id')
-        text = request.json.get('text')
-        rating = request.json.get('rating')
-        comment = request.json.get('comment')
-
-        if not walk_id or not user_id or rating is None:
-            return {"error": "walk_id, user_id, and rating are required fields"}, 400
-
-        review = Review(walk_id=walk_id, user_id=user_id, text=text, rating=rating, comment=comment )
-        db.session.add(review)
+        data = request.get_json()
+        new_review = Review(
+            text=data['text'],
+            user_id=data['user_id'],
+            walk_id=data['walk_id'],
+            rating=data['rating'],
+            comment=data['comment'],
+            event_name=data['event_name'],
+            location=data['location'],
+            date=data['date'],
+            time=data['time'],
+            category=data['category']
+        )
+        db.session.add(new_review)
         db.session.commit()
+        return new_review.to_dict(), 201
 
-        return {"message": "Review created successfully"}, 201
-    
+class ReviewResource(Resource):
+    def get(self, review_id):
+        review = Review.query.get_or_404(review_id)
+        return review.to_dict()
 
-
-
-api.add_resource(ReviewResource, '/reviews')
-
-class ReviewByIdResource(Resource):
     def patch(self, review_id):
-     review = Review.query.get(review_id)
-     if review:
-        updated_data = request.json
-        if 'rating' in updated_data:
-            review.rating = updated_data['rating']
-        if 'comment' in updated_data:
-            review.comment = updated_data['comment']
-        if 'text' in updated_data: 
-            review.text = updated_data['text']
+        data = request.get_json()
+        review = Review.query.get_or_404(review_id)
+        for key, value in data.items():
+            setattr(review, key, value)
         db.session.commit()
         return review.to_dict()
-     return {'error': 'Review not found'}, 404
-
 
     def delete(self, review_id):
-        review = Review.query.get(review_id)
-        if review:
-            db.session.delete(review)
-            db.session.commit()
-            return {'result': 'Review deleted'}
-        return {'error': 'Review not found'}, 404
+        review = Review.query.get_or_404(review_id)
+        db.session.delete(review)
+        db.session.commit()
+        return {}, 204
 
-    
+api.add_resource(ReviewsResource, '/api/reviews')
+api.add_resource(ReviewResource, '/api/reviews/<int:review_id>')
 
-api.add_resource(ReviewByIdResource, '/reviews/<int:review_id>')
+
+
 
 
 
