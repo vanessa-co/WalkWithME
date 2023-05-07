@@ -84,6 +84,12 @@ class Walk(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship('User', back_populates='walks')
 
+    @validates('photo')
+    def validate_photo(self, key, photo):
+        if not photo:
+            raise ValueError('A photo is required for a walk')
+        return photo
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -94,6 +100,8 @@ class Walk(db.Model, SerializerMixin):
             "description": self.description,
             "username": self.user.username,
         }
+
+
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
