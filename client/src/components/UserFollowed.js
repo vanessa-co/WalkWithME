@@ -1,7 +1,7 @@
 import React from 'react';
 
 function UserFollowed() {
-  return <div>coming soon...</div>;
+  return <div></div>;
 }
 
 export default UserFollowed;

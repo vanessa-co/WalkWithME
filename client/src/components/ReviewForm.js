@@ -1,13 +1,14 @@
-import { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { useReviews } from '../contexts/ReviewsContext';
 import { AuthContext } from '../contexts/AuthContext';
+import ReactStars from "react-rating-stars-component";
 
 const ReviewForm = () => {
   const { reviews, setReviews } = useReviews();
   const { user } = useContext(AuthContext);
   const [event_name, setEventName] = useState('');
   const [text, setText] = useState('');
-  const [rating, setRating] = useState('');
+  const [rating, setRating] = useState(0);
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
   const [date, setDate] = useState('');
@@ -29,28 +30,26 @@ const ReviewForm = () => {
     };
 
     fetch('/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newReview),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newReview),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setReviews([...reviews, data]);
-        })
-        .catch((error) => console.error('Error saving review:', error));
-      
+      .then((data) => {
+        setReviews([...reviews, data]);
+      })
+      .catch((error) => console.error('Error saving review:', error));
 
-  
     setEventName('');
     setText('');
-    setRating('');
+    setRating(0);
     setLocation('');
     setCategory('');
     setDate('');
@@ -58,72 +57,91 @@ const ReviewForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Add a new review</h2>
-      <label>
-        Event name:
-        <input
-          type="text"
-          value={event_name}
-          onChange={(e) => setEventName(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Review text:
-        <textarea value={text} onChange={(e) => setText(e.target.value)} required />
-      </label>
-      <label>
-        Rating:
-        <input
-          type="number"
-          step="0.1"
-          min="0"
-          max="5"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Location:
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Category:
-        <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-          <option value="">Select a category</option>
-          <option value="leisure">Leisure</option>
-          <option value="competitive">Competitive</option>
-          <option value="charity">Charity</option>
-        </select>
-      </label>
-      <label>
-        Date:
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Time:
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          required
-        />
-      </label>
-      <button type="submit">Add Review</button>
-    </form>
+    <div className="container">
+      <h2>Community Posts and Reviews</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label className="form-label">Event name:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={event_name}
+            onChange={(e) => setEventName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Review text:</label>
+          <textarea
+            className="form-control"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Rating:</label>
+          <div>
+          <ReactStars
+           count={5}
+           value={rating}
+           onChange={(newRating) => setRating(newRating)}
+           size={24}
+           activeColor="#ffd700"
+           />
+          </div>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Location:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Category:</label>
+          <select
+            className="form-select"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
+            <option value="">Select a category</option>
+            <option value="leisure">Leisure</option>
+            <option value="athletic">Athletic</option>
+            <option value="charity">Charity</option>
+          </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Date:</label>
+          <input
+            type="date"
+            className="form-control"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Time:</label>
+          <input
+            type="time"
+            className="form-control"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">
+          Add Review
+        </button>
+      </form>
+    </div>
   );
 };
-
-export default ReviewForm;
+  export default ReviewForm;
+  
+           

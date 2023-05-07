@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useReviews } from '../contexts/ReviewsContext';
 import ReviewForm from './ReviewForm';
+import ReactStars from "react-rating-stars-component";
+import { Card, Col, Container, Row, Form, Button } from 'react-bootstrap'
 
 const Reviews = () => {
   const { reviews, setReviews } = useReviews();
@@ -32,33 +34,51 @@ const Reviews = () => {
     setFilterCategory(e.target.value);
   };
 
+
   return (
-    <div>
-      <h2>Reviews</h2>
+    <Container>
+      <h2></h2>
       <ReviewForm />
-      <label>
-        Filter by category:
-        <select value={filterCategory} onChange={handleFilterChange}>
+      <Form.Group controlId="filterCategory" className="mb-3">
+        <Form.Label>Filter by category:</Form.Label>
+        <Form.Control as="select" value={filterCategory} onChange={handleFilterChange}>
           <option value="">All</option>
           <option value="leisure">Leisure</option>
-          <option value="competitive">Competitive</option>
+          <option value="athletic">Athletic</option>
           <option value="charity">Charity</option>
-        </select>
-      </label>
-      {filteredReviews.map(review => (
-        <div key={review.id}>
-          <h3>{review.event_name} ({review.rating} / 5)</h3>
-          <p>{review.text}</p>
-          <p><strong>Location:</strong> {review.location}</p>
-          <p><strong>Category:</strong> {review.category}</p>
-          <p><strong>Username:</strong> {review.username}</p>
-          <p><strong>Date:</strong> {review.date}</p>
-          <p><strong>Time:</strong> {review.time}</p>
-        </div>
-      ))}
-    </div>
+        </Form.Control>
+      </Form.Group>
+      <Row>
+        {filteredReviews.map(review => (
+          <Col key={review.id} md={6} lg={4} className="mb-4">
+            <Card>
+              <Card.Body>
+                <Card.Title>{review.event_name}</Card.Title>
+                <ReactStars
+                  count={5}
+                  value={review.rating}
+                  size={24}
+                  edit={false}
+                  activeColor="#ffd700"
+                />
+                <Card.Text>{review.text}</Card.Text>
+                <p><strong>Location:</strong> {review.location}</p>
+                <p><strong>Category:</strong> {review.category}</p>
+                <p><strong>Username:</strong> {review.username}</p>
+                <p><strong>Date:</strong> {review.date}</p>
+                <p><strong>Time:</strong> {review.time}</p>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
 };
 
 export default Reviews;
+
+
+
+
 

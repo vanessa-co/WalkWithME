@@ -188,3 +188,54 @@ img.recycle-icon {
 .followed-list {
   background-color: #fff;
 }
+
+
+/* LOGIN IN PAGE */
+
+.auth-container {
+  height: 100vh;
+  background-image: url("https://images.unsplash.com/photo-1560015534-cee980ba7e13?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80");
+  background-size: cover;
+  background-position: center;
+}
+
+.form-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+
+
+
+/* about us */
+
+.about-us-container {
+  width: 80%;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.about-us-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.about-us-text {
+  flex: 1;
+  padding: 20px;
+}
+
+.about-us-image {
+  flex: 1;
+  padding: 20px;
+}
+
+.about-us-image img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+

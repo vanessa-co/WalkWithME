@@ -246,6 +246,9 @@ api.add_resource(ReviewResource, '/api/reviews/<int:review_id>')
 
 
 
+
+
+
 class FollowedResource(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
