@@ -61,14 +61,13 @@ def seed_data():
     # Reviews for Vanessa's walks
     vanessa_review1 = Review(id=1, text='We had such a blast on our winee walk, a great time for groups of friends or couples!', user_id=vanessa.id, walk_id=vanessa_walk1.id, rating=5, event_name='Wine Walk', location='Central Park, NY', date='2023-05-01', time='15:00', category='leisure')
     vanessa_review2 = Review(id=2, text='Sign up for a mud run as soon as you can!', user_id=vanessa.id, walk_id=vanessa_walk2.id, rating=4, event_name='Mud Run', location='Hudson River Park, NY', date='2023-05-02', time='14:00', category='athletic')
-
 # Reviews for Kim's walks
     kim_review1 = Review(id=3, text='This nature walk was exactky what i needed!', user_id=kim.id, walk_id=kim_walk1.id, rating=5, event_name='Brooklyn Botanical Gardens', location='Brooklyn, NY', date='2023-05-03', time='11:00', category='leisure')
     kim_review2 = Review(id=4, text='the Tunnle run is for such a good cause. we look forward to it every year!', user_id=kim.id, walk_id=kim_walk2.id, rating=4, event_name='Tunnel Run', location='West Newyork, NJ', date='2023-05-04', time='16:00', category='Charity')
 
 # Reviews for Kevin's walks
-    kevin_review1 = Review(id=5, text='The zombie walk was a killer good time', user_id=kevin.id, walk_id=kevin_walk1.id, rating=4, event_name='Zombie Walk', location='Battery Park, NY', date='2023-05-05', time='09:00', category='leisure')
-    kevin_review2 = Review(id=6, text='the Iron man Run was the a thrill!', user_id=kevin.id, walk_id=kevin_walk2.id, rating=5, event_name='Iron Man', location='Prospect Park, NY', date='2023-05-06', time='9:00', category='Athletic')
+    kevin_review1 = Review(id=5, text='The zombie walk was a killer good time', user_id=kevin.id,walk_id=kevin_walk1.id, rating=4, event_name='Zombie Walk', location='Battery Park, NY', date='2023-05-05', time='09:00', category='leisure')
+    kevin_review2 = Review(id=6, text='the Iron man Run was the a thrill!', user_id=kevin.id, walk_id=kevin_walk2.id,rating=5, event_name='Iron Man', location='Prospect Park, NY', date='2023-05-06', time='9:00', category='Athletic')
 
 
 

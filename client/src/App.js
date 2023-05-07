@@ -9,7 +9,7 @@ import AboutUs from './components/AboutUs';
 import UserFollowers from './components/UserFollowers';
 import UserFollowed from './components/UserFollowed';
 import UserAddFollow from './components/UserAddFollow';
-import { ReviewsProvider } from './contexts/ReviewsContext';
+import { ReviewProvider } from './contexts/ReviewsContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext, AuthContextProvider } from './contexts/AuthContext';
@@ -20,7 +20,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
     <AuthContextProvider>
-      <ReviewsProvider>
+      <ReviewProvider>
           <Router>
             <Navbar />
             <Header/>
@@ -28,7 +28,7 @@ function App() {
             <Footer/>
           </Router>
           <ToastContainer />
-      </ReviewsProvider>
+      </ReviewProvider>
     </AuthContextProvider>
   );
 }

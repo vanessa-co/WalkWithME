@@ -100,7 +100,7 @@ class Review(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    walk_id = db.Column(db.Integer, db.ForeignKey('walks.id'), nullable=False)
+    walk_id = db.Column(db.Integer, db.ForeignKey('walks.id'), nullable=True)
     rating = db.Column(db.Float, nullable=False)
     comment = db.Column(db.String(255), nullable=True)
     user = db.relationship('User', back_populates='reviews')
@@ -124,6 +124,10 @@ class Review(db.Model, SerializerMixin):
             "time": self.time,  
             "category": self.category,
         }
+
+
+
+
 
 class Follow(db.Model, SerializerMixin):
     __tablename__ = 'follows'

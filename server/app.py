@@ -207,10 +207,8 @@ class ReviewsResource(Resource):
         new_review = Review(
             text=data['text'],
             user_id=data['user_id'],
-            walk_id=data['walk_id'],
-            rating=data['rating'],
-            comment=data['comment'],
             event_name=data['event_name'],
+            rating=data['rating'],
             location=data['location'],
             date=data['date'],
             time=data['time'],
