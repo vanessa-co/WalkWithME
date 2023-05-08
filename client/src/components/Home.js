@@ -27,7 +27,7 @@ const photos = [
   },
   {
     id: 5,
-    url: 'https://images.squarespace-cdn.com/content/v1/54d3a1abe4b000d5abdf8641/1429237613858-KZ7I0FNEDWO4UVJD2BN8/image-asset.jpeg',
+    url: 'https://img.freepik.com/premium-photo/happy-laughing-group-friends-walking-smiling-together-city-casual-excited-people-enjoying-relaxing-time-urban-town-cheerful-young-coworkers-having-fun-their-day-off_590464-67779.jpg?w=996',
     caption: 'The Neighborhood trail walk was lovely ⭐⭐⭐⭐⭐'
   },
 ];

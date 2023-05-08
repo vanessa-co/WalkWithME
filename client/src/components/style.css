@@ -108,7 +108,7 @@
 /* styles for the Header component */
 .navbar-brand {
   font-size: 2rem;
-  color: #110f0f;
+  color: #3c0de7;
 }
 
 .border-primary {
@@ -173,7 +173,7 @@ img.recycle-icon {
 
 .follower-list,
 .followed-list {
-  height: 100px;
+  height: 80px;
   overflow-y: scroll;
   border: 1px solid #ccc;
   padding: 10px;
@@ -305,4 +305,11 @@ img.recycle-icon {
 .App {
   background-color: #e0e0e2; 
   text-align: center;
+}
+
+
+
+.stars-container {
+  display: flex;
+  justify-content: center;
 }

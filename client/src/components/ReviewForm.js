@@ -85,7 +85,7 @@ const ReviewForm = ({ onSubmit }) => {
         </div>
         <div className="mb-3">
           <label className="form-label">Rating:</label>
-          <div>
+          <div className="stars-container"> 
           <ReactStars
            count={5}
            value={rating}
