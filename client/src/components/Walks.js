@@ -4,6 +4,7 @@
   import WalkItem from './WalkItem';
   import UserFollowers from './UserFollowers';
   import UserAddFollow from './UserAddFollow';
+  import { Card } from 'semantic-ui-react';
   
   
   function Walks() {
@@ -95,45 +96,44 @@
         <p>Thanks for posting!</p>
       </div>
     );
-  
-  
-    return (
-      <div>
-        <h2>...</h2>
-        {user && <p>Welcome, {user.username}!</p>}
-        {user && (
-          <UserFollowers
-            userId={user.id}
-            forceUpdate={refreshCounter}
-            handleFollow={handleFollow}
-            handleUnfollow={handleUnfollow}
+
+  return (
+    <div>
+      <h2>...</h2>
+      {user && <p>Welcome, {user.username}!</p>}
+      {user && (
+        <UserFollowers
+          userId={user.id}
+          forceUpdate={refreshCounter}
+          handleFollow={handleFollow}
+          handleUnfollow={handleUnfollow}
+        />
+      )}
+      {user && (
+        <UserAddFollow
+          userId={user.id}
+          onFollowChange={setRefreshCounter}
+          forceUpdate={setRefreshCounter}
+        />
+      )}
+      {user && <WalkForm onAddWalk={addWalk} />}
+      {showSuccessPopup && successPopup}
+      <Card.Group itemsPerRow={4}>
+        {walks.map((walk) => (
+          <WalkItem
+            key={walk.id}
+            walk={walk}
+            onEditWalk={handleEditWalk}
+            onDeleteWalk={handleDeleteWalk}
+            isOwner={user && user.id === walk.user_id}
           />
-        )}
-        {user && (
-          <UserAddFollow
-            userId={user.id}
-            onFollowChange={setRefreshCounter}
-            forceUpdate={setRefreshCounter}
-          />
-        )}
-        {user && <WalkForm onAddWalk={addWalk} />}
-        {showSuccessPopup && successPopup}
-        <ul>
-          {walks.map((walk) => (
-            <WalkItem
-              key={walk.id}
-              walk={walk}
-              onEditWalk={handleEditWalk}
-              onDeleteWalk={handleDeleteWalk}
-              isOwner={user && user.id === walk.user_id}
-            />
-          ))}
-        </ul>
-      </div>
-    );
-  }
-  
-  export default Walks;
+        ))}
+      </Card.Group>
+    </div>
+  );
+}
+
+export default Walks;
   
   
   
