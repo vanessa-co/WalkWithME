@@ -1,7 +1,24 @@
 import React from 'react';
 import './style.css';
 
-const UserList = ({ users, onFollow, onUnfollow, title, followerList, isNewUser }) => {
+const UserList = ({
+  users,
+  onFollow,
+  onUnfollow,
+  title,
+  followerList,
+  onFollowChange,
+}) => {
+  const handleFollowClick = (followedUserId) => {
+    onFollow(followedUserId);
+    onFollowChange((prev) => prev + 1);
+  };
+
+  const handleUnfollowClick = (followedUserId) => {
+    onUnfollow(followedUserId);
+    onFollowChange((prev) => prev + 1);
+  };
+
   return (
     <div className="user-list-container">
       <h3>{title}</h3>
@@ -9,7 +26,7 @@ const UserList = ({ users, onFollow, onUnfollow, title, followerList, isNewUser 
         {users?.map((user) => (
           <li key={user.id}>
             <div className="profile-container">
-              <img
+            <img
                 className="profile-photo"
                 src={
                   user.follower?.profile_photo ||
@@ -20,13 +37,25 @@ const UserList = ({ users, onFollow, onUnfollow, title, followerList, isNewUser 
               />
             </div>
             <div className="username-container">
-              {followerList ? user.follower_username || user.followed_username : user.username}
+              {followerList
+                ? user.follower_username || user.followed_username
+                : user.username}
             </div>
-            <div className="action-container">
+            <div className="follow-actions">
               {user.followed ? (
-                <button onClick={() => onUnfollow(user.id)}>Unfollow</button>
+                <button
+                  className="unfollow-button"
+                  onClick={() => handleUnfollowClick(user.id)}
+                >
+                  Unfollow
+                </button>
               ) : (
-                <button onClick={() => onFollow(user.id, isNewUser)}>Follow</button>
+                <button
+                  className="follow-button"
+                  onClick={() => handleFollowClick(user.id)}
+                >
+                  Follow
+                </button>
               )}
             </div>
           </li>

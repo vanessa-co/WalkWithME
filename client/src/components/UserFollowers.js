@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UserList from './UserList';
-import { Col, Container, Row } from 'react-bootstrap';
 
-const UserFollowers = ({ userId }) => {
+const UserFollowers = ({ userId, forceUpdate, handleFollow, handleUnfollow }) => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
 
@@ -12,9 +11,9 @@ const UserFollowers = ({ userId }) => {
       const data = await response.json();
       setFollowers(data);
     };
-  
+
     fetchFollowers();
-  }, [userId]);
+  }, [userId, forceUpdate]);
 
   useEffect(() => {
     const fetchFollowing = async () => {
@@ -22,62 +21,43 @@ const UserFollowers = ({ userId }) => {
       const data = await response.json();
       setFollowing(data);
     };
-  
-    fetchFollowing();
-  }, [userId]);
 
+    fetchFollowing();
+  }, [userId, forceUpdate]);
   return (
-    <Container fluid>
-      <Row>
-        <Col md={{ span: 4, offset: 4 }}>
-          <div className="user-container">
-            <h2>Followers:</h2>
-            <div className="user-scroll">
-              <UserList users={followers} followerList={true} />
-            </div>
-          </div>
-          <div className="user-container">
-            <h2>Following:</h2>
-            <div className="user-scroll">
-              <UserList users={following} followerList={true} />
-            </div>
-          </div>
-        </Col>
-      </Row>
-    </Container>
+    <div>
+      <h2>Followers:</h2>
+      <UserList
+        users={followers}
+        title="Your followers"
+        followerList
+        isNewUser={false}
+        onFollow={(followUserId) => {
+          handleFollow(followUserId);
+          setFollowing((prevFollowing) => [...prevFollowing, { followed_username: followUserId }]);
+        }}
+        onUnfollow={handleUnfollow}
+      />
+      <h2>Following:</h2>
+      <UserList
+        users={following}
+        title="People you're following"
+        followerList
+        isNewUser={false}
+        onFollow={(followUserId) => {
+          handleFollow(followUserId);
+          setFollowing((prevFollowing) => [...prevFollowing, { followed_username: followUserId }]);
+        }}
+        onUnfollow={(unfollowUserId) => {
+          handleUnfollow(unfollowUserId);
+          setFollowing((prevFollowing) =>
+            prevFollowing.filter((user) => user.followed_username !== unfollowUserId)
+          );
+        }}
+      />
+    </div>
   );
 };
 
 export default UserFollowers;
-
-
-
-// import React from 'react';
-// import UserList from './UserList';
-// import { Col, Container, Row } from 'react-bootstrap';
-
-// const UserFollowers = ({ userId, followers, following }) => {
-//   return (
-//     <Container fluid>
-//       <Row>
-//         <Col md={{ span: 4, offset: 4 }}>
-//           <div className="user-container">
-//             <h2>Followers:</h2>
-//             <div className="user-scroll">
-//               <UserList users={followers} followerList={true} />
-//             </div>
-//           </div>
-//           <div className="user-container">
-//             <h2>Following:</h2>
-//             <div className="user-scroll">
-//               <UserList users={following} followerList={true} />
-//             </div>
-//           </div>
-//         </Col>
-//       </Row>
-//     </Container>
-//   );
-// };
-
-// export default UserFollowers;
 
