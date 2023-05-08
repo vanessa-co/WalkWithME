@@ -57,47 +57,6 @@ const Auth = () => {
     }
   };
 
-  // return (
-  //   <div>
-  //     <h2>{isLogin ? 'Login' : 'Sign up'}</h2>
-  //     <form onSubmit={handleSubmit}>
-  //       {!isLogin && (
-  //         <div>
-  //           <label htmlFor="email">Email</label>
-  //           <input
-  //             type="email"
-  //             id="email"
-  //             value={email}
-  //             onChange={(e) => setEmail(e.target.value)}
-  //           />
-  //         </div>
-  //       )}
-  //       <div>
-  //         <label htmlFor="username">Username</label>
-  //         <input
-  //           type="text"
-  //           id="username"
-  //           value={username}
-  //           onChange={(e) => setUsername(e.target.value)}
-  //         />
-  //       </div>
-  //       <div>
-  //         <label htmlFor="password">Password</label>
-  //         <input
-  //           type="password"
-  //           id="password"
-  //           value={password}
-  //           onChange={(e) => setPassword(e.target.value)}
-  //         />
-  //       </div>
-  //       <button type="submit">{isLogin ? 'Login' : 'Sign up'}</button>
-  //     </form>
-  //     {error && <p>{error}</p>}
-  //     <button onClick={() => setIsLogin(!isLogin)}>
-  //       Switch to {isLogin ? 'Sign up' : 'Login'}
-  //     </button>
-  //   </div>
-  // );
   return (
     <Container fluid className="auth-container d-flex align-items-center">
       <Row className="justify-content-center">

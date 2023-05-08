@@ -2,7 +2,7 @@ import React from 'react';
 import './style.css';
 
 function AboutUs() {
-  const imageURL = 'https://www.arlingtonva.us/files/sharedassets/public/walking-to-school-bus-for-walk-friendly-communities-news-release-copy.jpg?w=1080';
+  const imageURL = 'https://images.unsplash.com/photo-1595239095154-7e9658044a85?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80';
 
   return (
     <div className="about-us-container">

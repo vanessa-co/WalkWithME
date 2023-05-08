@@ -75,7 +75,7 @@ const ReviewForm = ({ onSubmit }) => {
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Review text:</label>
+          <label className="form-label">Review:</label>
           <textarea
             className="form-control"
             value={text}
@@ -90,7 +90,7 @@ const ReviewForm = ({ onSubmit }) => {
            count={5}
            value={rating}
            onChange={(newRating) => setRating(newRating)}
-           size={24}
+           size={40}
            activeColor="#ffd700"
            />
           </div>

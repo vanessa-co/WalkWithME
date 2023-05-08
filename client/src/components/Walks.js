@@ -99,7 +99,7 @@
 
   return (
     <div>
-      <h2>...</h2>
+      <h2></h2>
       {user && <p>Welcome, {user.username}!</p>}
       {user && (
         <UserFollowers

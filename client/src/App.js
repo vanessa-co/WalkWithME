@@ -16,18 +16,21 @@ import { AuthContext, AuthContextProvider } from './contexts/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'leaflet/dist/leaflet.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './components/style.css'; 
 
 function App() {
   return (
     <AuthContextProvider>
       <ReviewProvider>
+        <div className="App"> 
           <Router>
             <Navbar />
-            <Header/>
+            <Header />
             <MainRoutes />
-            <Footer/>
+            <Footer />
           </Router>
           <ToastContainer />
+        </div> 
       </ReviewProvider>
     </AuthContextProvider>
   );
@@ -52,8 +55,4 @@ function MainRoutes() {
 }
 
 export default App;
-
-
-
-
 

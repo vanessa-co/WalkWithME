@@ -108,7 +108,7 @@
 /* styles for the Header component */
 .navbar-brand {
   font-size: 2rem;
-  color: #040404;
+  color: #110f0f;
 }
 
 .border-primary {
@@ -194,7 +194,7 @@ img.recycle-icon {
 
 .auth-container {
   height: 100vh;
-  background-image: url("https://images.unsplash.com/photo-1560015534-cee980ba7e13?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80");
+  background-image: url("https://images.unsplash.com/photo-1633483408137-87f2b1de542f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80");
   background-size: cover;
   background-position: center;
 }
@@ -269,8 +269,6 @@ img.recycle-icon {
 }
 
 
-
-
 .user-list-scroll {
   overflow-x: auto;
   white-space: nowrap;
@@ -300,4 +298,11 @@ img.recycle-icon {
 
 .scroll-container li {
   flex-shrink: 0;
+}
+
+
+
+.App {
+  background-color: #e0e0e2; 
+  text-align: center;
 }
