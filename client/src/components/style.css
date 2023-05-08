@@ -270,7 +270,7 @@ img.recycle-icon {
 
 
 
-/* maybe this swill work*/
+
 .user-list-scroll {
   overflow-x: auto;
   white-space: nowrap;
@@ -287,9 +287,6 @@ img.recycle-icon {
 
 
 
-.user-list-container {
-  /* Add your existing styles here */
-}
 
 .user-list {
   overflow-x: auto;

@@ -1,14 +1,22 @@
-
 import { useState, useEffect } from 'react';
 import { useReviews } from '../contexts/ReviewsContext';
 import ReviewForm from './ReviewForm';
 import ReactStars from "react-rating-stars-component";
-import { Card, Col, Container, Row, Form, Button } from 'react-bootstrap'
+import { Card, Col, Container, Row, Form, Button, Modal } from 'react-bootstrap'
 
 const Reviews = () => {
   const { reviews, setReviews } = useReviews();
   const [filteredReviews, setFilteredReviews] = useState(reviews);
   const [filterCategory, setFilterCategory] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   useEffect(() => {
     fetch('/api/reviews')
@@ -34,11 +42,10 @@ const Reviews = () => {
     setFilterCategory(e.target.value);
   };
 
-
   return (
     <Container>
       <h2></h2>
-      <ReviewForm />
+      <ReviewForm onSubmit={handleShowModal} />
       <Form.Group controlId="filterCategory" className="mb-3">
         <Form.Label>Filter by category:</Form.Label>
         <Form.Control as="select" value={filterCategory} onChange={handleFilterChange}>
@@ -72,11 +79,24 @@ const Reviews = () => {
           </Col>
         ))}
       </Row>
+
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Thank you for posting</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Your review has been submitted successfully!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
 
 export default Reviews;
+
 
 
 

@@ -3,7 +3,7 @@ import { useReviews } from '../contexts/ReviewsContext';
 import { AuthContext } from '../contexts/AuthContext';
 import ReactStars from "react-rating-stars-component";
 
-const ReviewForm = () => {
+const ReviewForm = ({ onSubmit }) => {
   const { reviews, setReviews } = useReviews();
   const { user } = useContext(AuthContext);
   const [event_name, setEventName] = useState('');
@@ -54,6 +54,10 @@ const ReviewForm = () => {
     setCategory('');
     setDate('');
     setTime('');
+
+    if (onSubmit) {
+      onSubmit();
+    }
   };
 
   return (
@@ -142,6 +146,6 @@ const ReviewForm = () => {
     </div>
   );
 };
-  export default ReviewForm;
-  
-           
+
+export default ReviewForm;
+
