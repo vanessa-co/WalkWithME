@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UserList from './UserList';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Container, Header, Tab } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
 
 const UserAddFollow = ({ userId, onFollowChange }) => {
   const [allUsers, setAllUsers] = useState([]);
@@ -47,24 +48,31 @@ const UserAddFollow = ({ userId, onFollowChange }) => {
     }
   };
 
-  return (
-    <Container fluid>
-      <Row>
-        <Col md={{ span: 4, offset: 5 }}>
-          <div className="user-container">
-            <h2>All Users:</h2>
-            <div className="user-scroll">
-              <UserList
-                users={allUsers}
-                onFollow={handleFollow}
-                onUnfollow={handleUnfollow}
-                title=""
-                onFollowChange={setRefreshCounter}
-              />
-            </div>
+  const panes = [
+    {
+      menuItem: 'All Users',
+      render: () => (
+        <Tab.Pane>
+          <div className="user-scroll">
+            <UserList
+              users={allUsers}
+              onFollow={handleFollow}
+              onUnfollow={handleUnfollow}
+              title=""
+              onFollowChange={setRefreshCounter}
+            />
           </div>
-        </Col>
-      </Row>
+        </Tab.Pane>
+      ),
+    },
+  ];
+
+  return (
+    <Container>
+      <Header as="h2" textAlign="center">
+        Community Members:
+      </Header>
+      <Tab panes={panes} />
     </Container>
   );
 };

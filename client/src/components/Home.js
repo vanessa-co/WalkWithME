@@ -38,7 +38,7 @@ const HomePage = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((activeIndex + 1) % photos.length);
-    }, 3000);
+    }, 2000);
     return () => clearInterval(interval);
   }, [activeIndex]);
 

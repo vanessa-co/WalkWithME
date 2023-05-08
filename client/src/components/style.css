@@ -239,3 +239,68 @@ img.recycle-icon {
 }
 
 
+/* userlist */
+
+.user-list {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  list-style: none;
+  padding: 0;
+}
+
+.user-list li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+
+
+
+/* scroll bar */
+.scroll-container {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.user-list {
+  display: flex;
+}
+
+
+
+/* maybe this swill work*/
+.user-list-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.user-list {
+  display: flex;
+}
+
+.user-list li {
+  display: inline-block;
+}
+
+
+
+.user-list-container {
+  /* Add your existing styles here */
+}
+
+.user-list {
+  overflow-x: auto;
+}
+
+.scroll-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.scroll-container li {
+  flex-shrink: 0;
+}

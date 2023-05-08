@@ -5,6 +5,7 @@
   import UserFollowers from './UserFollowers';
   import UserAddFollow from './UserAddFollow';
   
+  
   function Walks() {
     const [walks, setWalks] = useState([]);
     const { user } = useContext(AuthContext);
@@ -98,7 +99,7 @@
   
     return (
       <div>
-        <h2>Walks</h2>
+        <h2>...</h2>
         {user && <p>Welcome, {user.username}!</p>}
         {user && (
           <UserFollowers
