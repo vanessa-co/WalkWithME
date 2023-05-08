@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from app import app, db
 from models import User, Walk, Review, Follow
@@ -43,31 +42,37 @@ def seed_data():
     users = User.query.all()
 
     # Walks for Vanessa
-    vanessa_walk1 = Walk(name="Wine Walk", location='Central Park', distance=2.5, photo='https://i.natgeofe.com/n/15ec8dec-df7c-45af-a0ae-08d4e906a134/belvedere-castle.jpg?w=2880&h=2160', user_id=vanessa.id)
-    vanessa_walk2 = Walk(name="Mud Run", location='Hudson River Park', distance=3.2, photo='https://www.frommers.com/system/media_items/attachments/000/868/444/s980/Frommers-New-York-City-jogging-hudson-park-1190x768.jpg?1646914426', user_id=vanessa.id)
+    vanessa_walk1 = Walk(name="Wine Walk", location='Central Park', distance=2.5, photo='https://www.splashway.com/wp-content/uploads/2022/03/BLOG.jpg', user_id=vanessa.id)
+    vanessa_walk2 = Walk(name="Mud Run", location='Hudson River Park', distance=5.0, photo='https://www.active.com/Assets/Running/460/10-tips-mud-run-460.jpg', user_id=vanessa.id)
 
     # Walks for Kim
-    kim_walk1 = Walk(name="High Line Walk", location='High Line', distance=1.5, photo='https://assets.gocity.com/files/ufrfmb171/files/featured_images/shutterstock_247505947.jpg', user_id=kim.id)
-    kim_walk2 = Walk(name="Brooklyn Bridge Park Walk", location='Brooklyn Bridge Park', distance=2.0, photo='https://wp.zillowstatic.com/streeteasy/2/GettyImages-668600109-a0cd92.jpg', user_id=kim.id)
+    kim_walk1 = Walk(name="Flower Power", location='Brooklyn Botanical Gardens', distance=2.5, photo='https://yourbrooklynguide.com/wp-content/uploads/2020/08/Rose-Garden-at-Brooklyn-Botanic-Garden.jpg', user_id=kim.id)
+    kim_walk2 = Walk(name="Tunnel Run", location='West New York', distance=3.0, photo='https://www.sonj.org/wp-content/uploads/2022/05/ltc-photo-8.jpg', user_id=kim.id)
 
     # Walks for Kevin
-    kevin_walk1 = Walk(name="Battery Park Walk", location='Battery Park', distance=1.8, photo='https://www.nycgo.com/images/neighborhoods/27/battery-park-malcolm-brown-29__large.jpg', user_id=kevin.id)
-    kevin_walk2 = Walk(name="Prospect Park Walk", location='Prospect Park', distance=2.8, photo='https://www.tripsavvy.com/thmb/DEzP48T8owV1q2yWmhezZc4u8aw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/autumnal-reflections-657130574-5a85a0b73de4230037ded41d.jpg', user_id=kevin.id)
+    kevin_walk1 = Walk(name="Zombie Walk", location='Battery Park', distance=1.8, photo='https://www.thestate.com/entertainment/local-events/sc7bil/picture180691751/alternates/LANDSCAPE_1140/zombiewalk3', user_id=kevin.id)
+    kevin_walk2 = Walk(name="Iron Man", location='Prospect Park', distance=2.8, photo='https://www.drjimtaylor.com/4.0/wp-content/uploads/2020/12/IM-1.jpg', user_id=kevin.id)
 
     db.session.add_all([vanessa_walk1, vanessa_walk2, kim_walk1, kim_walk2, kevin_walk1, kevin_walk2])
     db.session.commit()
 
 
     # Reviews for Vanessa's walks
-    vanessa_review1 = Review(id=1, text='We had such a blast on our winee walk, a great time for groups of friends or couples!', user_id=vanessa.id, walk_id=vanessa_walk1.id, rating=5, event_name='Wine Walk', location='Central Park, NY', date='2023-05-01', time='15:00', category='leisure')
-    vanessa_review2 = Review(id=2, text='Sign up for a mud run as soon as you can!', user_id=vanessa.id, walk_id=vanessa_walk2.id, rating=4, event_name='Mud Run', location='Hudson River Park, NY', date='2023-05-02', time='14:00', category='athletic')
+    vanessa_review1 = Review(id=1, text='The wine walk was a delightful experience, allowing me to sample a variety of wines while enjoying a leisurely stroll through the park. The picturesque scenery and knowledgeable guides made for a truly enjoyable outing.', 
+                             user_id=vanessa.id, walk_id=vanessa_walk1.id, rating=5, event_name='Wine Walk', location='Central Park, NY', date='2023-05-01', time='15:00', category='leisure')
+    vanessa_review2 = Review(id=2, text='The mud run was an exhilarating and challenging adventure that pushed me to my limits. The camaraderie and sense of achievement among fellow participants made it a truly unforgettable experience!', 
+                             user_id=vanessa.id, walk_id=vanessa_walk2.id, rating=4, event_name='Mud Run', location='Hudson River Park, NY', date='2023-05-02', time='14:00', category='athletic')
 # Reviews for Kim's walks
-    kim_review1 = Review(id=3, text='This nature walk was exactky what i needed!', user_id=kim.id, walk_id=kim_walk1.id, rating=5, event_name='Brooklyn Botanical Gardens', location='Brooklyn, NY', date='2023-05-03', time='11:00', category='leisure')
-    kim_review2 = Review(id=4, text='the Tunnle run is for such a good cause. we look forward to it every year!', user_id=kim.id, walk_id=kim_walk2.id, rating=4, event_name='Tunnel Run', location='West Newyork, NJ', date='2023-05-04', time='16:00', category='Charity')
+    kim_review1 = Review(id=3, text='The Brooklyn Botanical Gardens walk was a tranquil and scenic escape from the hustle and bustle of city life, filled with vibrant colors and fragrant blooms that invigorated the senses. The knowledgeable guides provided insightful commentary that deepened my appreciation for the natural beauty of the gardens.',
+                          user_id=kim.id, walk_id=kim_walk1.id, rating=5, event_name='Brooklyn Botanical Gardens', location='Brooklyn, NY', date='2023-05-03', time='11:00', category='leisure')
+    kim_review2 = Review(id=4, text='The Tunnel Run for the Special Olympics was an inspiring event that brought together individuals of all abilities to support a great cause. The sense of community and inclusion, combined with the challenging tunnel course, made it a truly memorable experience for everyone involved.', 
+                         user_id=kim.id, walk_id=kim_walk2.id, rating=4, event_name='Tunnel Run', location='West New York, NJ', date='2023-05-04', time='16:00', category='Charity')
 
 # Reviews for Kevin's walks
-    kevin_review1 = Review(id=5, text='The zombie walk was a killer good time', user_id=kevin.id,walk_id=kevin_walk1.id, rating=4, event_name='Zombie Walk', location='Battery Park, NY', date='2023-05-05', time='09:00', category='leisure')
-    kevin_review2 = Review(id=6, text='the Iron man Run was the a thrill!', user_id=kevin.id, walk_id=kevin_walk2.id,rating=5, event_name='Iron Man', location='Prospect Park, NY', date='2023-05-06', time='9:00', category='Athletic')
+    kevin_review1 = Review(id=5, text='The zombie walk had a fun, campy atmosphere and the costumes were impressive. However, the walk was disorganized and lacked a clear route, which made the experience less enjoyable than it could have been.', 
+                           user_id=kevin.id,walk_id=kevin_walk1.id, rating=3, event_name='Zombie Walk', location='Battery Park, NY', date='2023-05-05', time='09:00', category='leisure')
+    kevin_review2 = Review(id=6, text='The Iron Man run was an intense and grueling event that pushed athletes to their limits both physically and mentally. The impressive feats of strength and endurance on display were awe-inspiring, making it a thrilling and unforgettable experience for both participants and spectators.', 
+                           user_id=kevin.id, walk_id=kevin_walk2.id,rating=5, event_name='Iron Man', location='Prospect Park, NY', date='2023-05-06', time='9:00', category='Athletic')
 
 
 
@@ -109,4 +114,3 @@ def seed_data():
 if __name__ == '__main__':
     with app.app_context():
         seed_data()
-
